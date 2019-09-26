@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using VenueAPI.BLL;
+using VLibraries.APIModels;
 using VLibraries.CustomExceptions;
 using VLibraries.ResponseModels;
 using VLibraries.VenueService;
@@ -24,14 +25,14 @@ namespace VenueAPI.API
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult<ResponseBase<bool>>> AddVenueAsync()
+        public async Task<ActionResult<ResponseBase<Venue>>> AddVenueAsync([FromBody] Venue venue)
         {
             if (!ModelState.IsValid)
                 throw new HttpStatusCodeResponseException(HttpStatusCode.BadRequest);
 
-            bool result = await _venueProvider.AddVenueAsync();
+            Venue result = await _venueProvider.AddVenueAsync(venue);
 
-            return new ResponseBase<bool>(result);
+            return new ResponseBase<Venue>(result);
         }
     }
 }

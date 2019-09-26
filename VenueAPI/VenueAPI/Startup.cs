@@ -7,7 +7,11 @@ using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using Swashbuckle.AspNetCore.Swagger;
+using VenueAPI.BLL;
+using VenueAPI.DAL;
 using VLibraries.CommonMiddleware;
+using VLibraries.ExceptionHadler;
+using VLibraries.ExceptionHandler;
 
 namespace VenueAPI
 {
@@ -23,6 +27,10 @@ namespace VenueAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IVenueProvider, VenueProvider>()
+                .AddSingleton<IVenueRepository, VenueRepository>()
+                .AddSingleton<IExceptionHandler, ExceptionHandler>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSwaggerGen(c =>

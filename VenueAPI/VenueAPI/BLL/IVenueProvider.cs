@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
+using VLibraries.APIModels;
 
 namespace VenueAPI.BLL
 {
     public interface IVenueProvider
     {
-        Task<bool> AddVenueAsync();
+        Task<Venue> AddVenueAsync(Venue venue);
     }
 }
