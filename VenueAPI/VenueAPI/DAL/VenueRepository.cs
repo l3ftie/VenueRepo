@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Configuration;
 using VLibraries.APIModels;
 using VLibraries.CustomExceptions;
@@ -19,8 +20,8 @@ namespace VenueAPI.DAL
         {
             _connectionString = config.GetConnectionString("LocalSqlServer");
         }
-
-        public async Task<Venue> AddVenueAsync(Venue venue)
+        
+        public async Task<VenueDto> AddVenueAsync(VenueRequest venue)
         {
             string insertVenueSql =
             "DECLARE @TempTable table([VenueId] [uniqueidentifier]); " +
@@ -31,15 +32,78 @@ namespace VenueAPI.DAL
 
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                IEnumerable<Guid> results = await con.QueryAsync<Guid>(insertVenueSql, venue);
+                Guid insertedVenueId = await con.QueryFirstOrDefaultAsync<Guid>(insertVenueSql, venue);
 
-                if (results.Count() == 0)
+                if (insertedVenueId == Guid.Empty)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
-                Guid insertedVenueId = results.FirstOrDefault();
-
-                return new Venue();
+                return await GetVenueAsync(insertedVenueId);
             }
+        }
+        
+        public async Task<VenueDto> GetVenueAsync(Guid venueId)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                VenueDto dto = await con.GetAsync<VenueDto>(venueId);
+
+                if (dto == null)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
+
+                return dto;
+            }
+        }
+
+        public async Task<List<VenueDto>> GetVenuesAsync()
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                IEnumerable<VenueDto> dtos = await con.GetAllAsync<VenueDto>();
+
+                if (dtos == null || dtos.Count() == 0)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
+
+                return dtos.ToList();
+            }
+        }
+
+        public async Task<VenueDto> EditVenueAsync(VenueRequest venue, Guid venueId)
+        {
+            VenueDto dto = new VenueDto
+            {
+                VenueId = venueId,
+                Description = venue.Description,
+                MUrl = venue.MUrl        
+            };
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                bool result = await con.UpdateAsync(dto);
+
+                if (!result)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+
+                return dto;
+            }
+        }
+
+        public async Task<bool> DeleteVenueAsync(Guid id)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                bool result = await con.DeleteAsync(new VenueDto { VenueId = id });
+
+                if (!result)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+
+                return result;
+            }
+        }
+
+
+        public async Task<VenueDto> AddSpaceAsync(SpaceRequest space, Guid venueId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

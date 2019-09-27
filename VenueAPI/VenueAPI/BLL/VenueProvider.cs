@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VenueAPI.DAL;
 using VLibraries.APIModels;
@@ -13,9 +15,35 @@ namespace VenueAPI.BLL
             _venueRepo = venueRepo;
         }
 
-        public async Task<Venue> AddVenueAsync(Venue venue)
+        public async Task<VenueDto> AddVenueAsync(VenueRequest venue)
         {
             return await _venueRepo.AddVenueAsync(venue);
+        }
+
+        public async Task<VenueDto> GetVenueAsync(Guid id)
+        {
+            return await _venueRepo.GetVenueAsync(id);
+        }
+
+        public async Task<List<VenueDto>> GetVenuesAsync()
+        {
+            return await _venueRepo.GetVenuesAsync();
+        }
+
+        public async Task<VenueDto> EditVenueAsync(VenueRequest venue, Guid id)
+        {
+            return await _venueRepo.EditVenueAsync(venue, id);
+        }
+
+        public async Task<bool> DeleteVenueAsync(Guid id)
+        {
+            return await _venueRepo.DeleteVenueAsync(id);
+        }
+
+
+        public async Task<VenueDto> AddSpaceAsync(SpaceRequest space, Guid venueId)
+        {
+            return await _venueRepo.AddSpaceAsync(space, venueId);
         }
     }
 }
