@@ -73,6 +73,10 @@ namespace VenueAPI.DAL
         {
             string getSpacesByVenueIdSql = "SELECT * FROM Space WHERE venueId = @venueId";
 
+            string getSpaceImagesSql = "SELECT * FROM SpaceImage WHERE SpaceId IN @spaceIds";
+
+            IEnumerable<SpaceImageDto> spaceImages = new List<SpaceImageDto>();
+
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>(getSpacesByVenueIdSql, new { venueId });
@@ -80,9 +84,15 @@ namespace VenueAPI.DAL
                 if (spaces == null || (requestSpecificallyForSpaces && spaces.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
+                IEnumerable<Guid> spaceIds = spaces.Select(x => x.SpaceId);
+                if (spaceIds.Count() > 0)
+                {
+                    spaceImages = await con.QueryAsync<SpaceImageDto>(getSpaceImagesSql, new { spaceIds = spaceIds });
+                }
+
                 foreach (SpaceDto space in spaces)
                 {
-                    space.SpaceImages = await _spaceImagesRepo.GetSpaceImagesAsync(venueId, space.SpaceId, false);
+                    space.SpaceImages = spaceImages.Where(x => x.SpaceId == space.SpaceId).ToList();
                 }
 
                 return spaces.ToList();

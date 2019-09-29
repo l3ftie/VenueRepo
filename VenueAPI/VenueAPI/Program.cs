@@ -11,7 +11,8 @@ namespace VenueAPI
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+            WebHost.CreateDefaultBuilder(args)            
+            .UseUrls("http://*:52000", "https://*:52001")
+            .UseStartup<Startup>();
     }
 }

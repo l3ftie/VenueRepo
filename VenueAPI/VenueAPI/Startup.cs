@@ -69,7 +69,7 @@ namespace VenueAPI
 
             app.ConfigureCustomExceptionMiddleware<VenueAPIExceptionMiddleware>();
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseMvc();
 
