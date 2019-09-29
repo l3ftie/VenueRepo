@@ -23,6 +23,7 @@ namespace VenueAPI.API
             _venueProvider = venueProvider;
         }
 
+        #region Venues
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -30,7 +31,7 @@ namespace VenueAPI.API
         [HttpPost]
         [Route("")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> AddVenueAsync([FromBody] VenueRequest venue)
+        public async Task<ActionResult<ResponseBase<VenueDto>>> AddVenueAsync([FromBody] Venue venue)
         {
             VenueDto result = await _venueProvider.AddVenueAsync(venue);
 
@@ -73,7 +74,7 @@ namespace VenueAPI.API
         [HttpPatch]
         [Route("{venueId}")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> EditVenueAsync([FromBody] VenueRequest venue, Guid venueId)
+        public async Task<ActionResult<ResponseBase<VenueDto>>> EditVenueAsync([FromBody] Venue venue, Guid venueId)
         {
             VenueDto result = await _venueProvider.EditVenueAsync(venue, venueId);
 
@@ -94,7 +95,7 @@ namespace VenueAPI.API
 
             return new ResponseBase<bool>(result);
         }
-
+        #endregion
 
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -104,7 +105,7 @@ namespace VenueAPI.API
         [HttpPost]
         [Route("{venueId}")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> AddSpaceAsync([FromBody] SpaceRequest venue, Guid venueId)
+        public async Task<ActionResult<ResponseBase<VenueDto>>> AddSpaceAsync([FromBody] Space venue, Guid venueId)
         {
             throw new NotImplementedException();
         }

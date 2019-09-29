@@ -15,7 +15,7 @@ namespace VenueAPI.BLL
             _venueRepo = venueRepo;
         }
 
-        public async Task<VenueDto> AddVenueAsync(VenueRequest venue)
+        public async Task<VenueDto> AddVenueAsync(Venue venue)
         {
             return await _venueRepo.AddVenueAsync(venue);
         }
@@ -30,7 +30,7 @@ namespace VenueAPI.BLL
             return await _venueRepo.GetVenuesAsync();
         }
 
-        public async Task<VenueDto> EditVenueAsync(VenueRequest venue, Guid id)
+        public async Task<VenueDto> EditVenueAsync(Venue venue, Guid id)
         {
             return await _venueRepo.EditVenueAsync(venue, id);
         }
@@ -41,7 +41,7 @@ namespace VenueAPI.BLL
         }
 
 
-        public async Task<VenueDto> AddSpaceAsync(SpaceRequest space, Guid venueId)
+        public async Task<VenueDto> AddSpaceAsync(Space space, Guid venueId)
         {
             return await _venueRepo.AddSpaceAsync(space, venueId);
         }

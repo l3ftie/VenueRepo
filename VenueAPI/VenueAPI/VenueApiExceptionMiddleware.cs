@@ -28,7 +28,7 @@ namespace VenueAPI
             }
             catch (HttpStatusCodeResponseException ex)
             {
-                _logger.LogError($"HTTP Status Code Response: {(int)ex.HttpStatusCode} Exception:  {ex}");
+                _logger.LogError($"HTTP Status Code Response: {(int)ex.HttpStatusCode} - {ex.Message}");
 
                 await _exceptionHandler.HandleHttpStatusCodeResponseExceptionAsync(httpContext, ex);
             }

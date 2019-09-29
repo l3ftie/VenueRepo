@@ -7,12 +7,12 @@ namespace VenueAPI.BLL
 {
     public interface IVenueProvider
     {
-        Task<VenueDto> AddVenueAsync(VenueRequest venue);
+        Task<VenueDto> AddVenueAsync(Venue venue);
         Task<VenueDto> GetVenueAsync(Guid venueId);
         Task<List<VenueDto>> GetVenuesAsync();
-        Task<VenueDto> EditVenueAsync(VenueRequest venue, Guid venueId);
+        Task<VenueDto> EditVenueAsync(Venue venue, Guid venueId);
         Task<bool> DeleteVenueAsync(Guid venueId);
 
-        Task<VenueDto> AddSpaceAsync(SpaceRequest venue, Guid venueId);
+        Task<VenueDto> AddSpaceAsync(Space venue, Guid venueId);
     }
 }

@@ -21,13 +21,17 @@ namespace VenueAPI.DAL
             _connectionString = config.GetConnectionString("LocalSqlServer");
         }
         
-        public async Task<VenueDto> AddVenueAsync(VenueRequest venue)
+        public async Task<VenueDto> AddVenueAsync(Venue venue)
         {
+            //Need to use manual SQL (Not Dapper.Contrib extensions) to get the venueID after insert in 1 call
+
             string insertVenueSql =
             "DECLARE @TempTable table([VenueId] [uniqueidentifier]); " +
-            "INSERT INTO Venue (Description, MUrl) " +
+            "INSERT INTO Venue (Title, Description, Summary, Testimonial, TestimonialContactName, " +
+            "TestimonialContactOrganisation, TestimonialContactEmail, MUrl) " +
             "   OUTPUT INSERTED.[VenueId] INTO @TempTable " +
-            "VALUES (@Description, @MUrl);" +
+            "VALUES (@Title, @Description, @Summary, @Testimonial, @TestimonialContactName, " +
+            "@TestimonialContactOrganisation, @TestimonialContactEmail, @MUrl);" +
             "SELECT [VenueId] FROM @TempTable;";
 
             using (SqlConnection con = new SqlConnection(_connectionString))
@@ -67,8 +71,9 @@ namespace VenueAPI.DAL
             }
         }
 
-        public async Task<VenueDto> EditVenueAsync(VenueRequest venue, Guid venueId)
+        public async Task<VenueDto> EditVenueAsync(Venue venue, Guid venueId)
         {
+            //Map this and make all return types DTO from repo
             VenueDto dto = new VenueDto
             {
                 VenueId = venueId,
@@ -101,7 +106,7 @@ namespace VenueAPI.DAL
         }
 
 
-        public async Task<VenueDto> AddSpaceAsync(SpaceRequest space, Guid venueId)
+        public async Task<VenueDto> AddSpaceAsync(Space space, Guid venueId)
         {
             throw new NotImplementedException();
         }
