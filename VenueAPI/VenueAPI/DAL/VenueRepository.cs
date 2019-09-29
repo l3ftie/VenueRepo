@@ -69,10 +69,6 @@ namespace VenueAPI.DAL
 
         public async Task<List<VenueDto>> GetVenuesAsync()
         {
-            string getVenueImagesSql = "SELECT * FROM VenueImage WHERE VenueId IN @venueIds";
-
-            string getSpacesSql = "SELECT * FROM Space WHERE SpaceId IN @spaceIds";
-
             IEnumerable<VenueImageDto> venueImages = new List<VenueImageDto>();
 
             IEnumerable<SpaceDto> spaces = new List<SpaceDto>();
@@ -81,19 +77,24 @@ namespace VenueAPI.DAL
             {
                 IEnumerable<VenueDto> venueDtos = await con.GetAllAsync<VenueDto>();
 
+                if (venueDtos == null || venueDtos.Count() == 0)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
+
                 //Gather Venues with matching Ids 
                 IEnumerable <Guid> venueImageIds = venueDtos.Select(x => x.VenueId);
+
                 if (venueImageIds.Count() > 0)
                 {
-                    venueImages = await con.QueryAsync<VenueImageDto>(getVenueImagesSql, new { venueIds = venueImageIds });
+                    venueImages = await con.QueryAsync<VenueImageDto>("SELECT * FROM VenueImage WHERE VenueId IN @venueIds", new { venueIds = venueImageIds });
                 }
 
                 //Gather Spaces with matching Ids 
                 List<Guid> spaceIds = new List<Guid>();
+
                 venueDtos.Select(x => x.Spaces).ToList().ForEach(y => y.ForEach(t => spaceIds.Add(t.SpaceId)));
                 if (spaceIds.Count > 0)
                 {
-                    spaces = await con.QueryAsync<SpaceDto>(getSpacesSql, new { spaceIds });
+                    spaces = await con.QueryAsync<SpaceDto>("SELECT * FROM Space WHERE SpaceId IN @spaceIds", new { spaceIds });
                 }
 
                 //Map to Models
@@ -103,9 +104,6 @@ namespace VenueAPI.DAL
 
                     venue.Spaces = spaces.Where(x => x.VenueId == venue.VenueId).ToList();
                 }
-
-                if (venueDtos == null || venueDtos.Count() == 0)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
                 return venueDtos.ToList();
             }

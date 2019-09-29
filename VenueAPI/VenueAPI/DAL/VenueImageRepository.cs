@@ -50,11 +50,9 @@ namespace VenueAPI.DAL
 
         public async Task<List<VenueImageDto>> GetVenueImagesAsync(Guid venueId)
         {
-            string getVenueImagesByVenueIdSql = "SELECT * FROM VenueImage WHERE venueId = @venueId";
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                IEnumerable<VenueImageDto> venueImages = await con.QueryAsync<VenueImageDto>(getVenueImagesByVenueIdSql, new { venueId });
+                IEnumerable<VenueImageDto> venueImages = await con.QueryAsync<VenueImageDto>("SELECT * FROM VenueImage WHERE venueId = @venueId", new { venueId });
 
                 if (venueImages == null)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);

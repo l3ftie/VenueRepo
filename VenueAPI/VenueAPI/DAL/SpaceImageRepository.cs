@@ -50,11 +50,9 @@ namespace VenueAPI.DAL
 
         public async Task<List<SpaceImageDto>> GetSpaceImagesAsync(Guid venueId, Guid spaceId, bool requestSpecificallyForSpaceImages = true)
         {
-            string getSpaceImagesBySpaceIdSql = "SELECT * FROM SpaceImage WHERE spaceId = @spaceId";
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                IEnumerable<SpaceImageDto> spaceImages = await con.QueryAsync<SpaceImageDto>(getSpaceImagesBySpaceIdSql, new { spaceId });
+                IEnumerable<SpaceImageDto> spaceImages = await con.QueryAsync<SpaceImageDto>("SELECT * FROM SpaceImage WHERE spaceId = @spaceId", new { spaceId });
 
                 if (spaceImages == null || (requestSpecificallyForSpaceImages && spaceImages.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);

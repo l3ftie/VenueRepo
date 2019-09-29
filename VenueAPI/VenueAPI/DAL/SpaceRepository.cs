@@ -54,11 +54,9 @@ namespace VenueAPI.DAL
 
         public async Task<SpaceDto> GetSpaceAsync(Guid venueId, Guid spaceId, bool requestSpecificallyForSpaces = true)
         {
-            string getSpaceByIdSql = "SELECT * FROM Space WHERE spaceId = @spaceId";
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                SpaceDto space = await con.QueryFirstAsync<SpaceDto>(getSpaceByIdSql, new { spaceId });
+                SpaceDto space = await con.QueryFirstAsync<SpaceDto>("SELECT * FROM Space WHERE spaceId = @spaceId", new { spaceId });
 
                 if (space == null && requestSpecificallyForSpaces)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
@@ -71,15 +69,11 @@ namespace VenueAPI.DAL
 
         public async Task<List<SpaceDto>> GetSpacesAsync(Guid venueId, bool requestSpecificallyForSpaces = true)
         {
-            string getSpacesByVenueIdSql = "SELECT * FROM Space WHERE venueId = @venueId";
-
-            string getSpaceImagesSql = "SELECT * FROM SpaceImage WHERE SpaceId IN @spaceIds";
-
             IEnumerable<SpaceImageDto> spaceImages = new List<SpaceImageDto>();
 
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>(getSpacesByVenueIdSql, new { venueId });
+                IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>("SELECT * FROM Space WHERE venueId = @venueId", new { venueId });
 
                 if (spaces == null || (requestSpecificallyForSpaces && spaces.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
@@ -87,7 +81,7 @@ namespace VenueAPI.DAL
                 IEnumerable<Guid> spaceIds = spaces.Select(x => x.SpaceId);
                 if (spaceIds.Count() > 0)
                 {
-                    spaceImages = await con.QueryAsync<SpaceImageDto>(getSpaceImagesSql, new { spaceIds = spaceIds });
+                    spaceImages = await con.QueryAsync<SpaceImageDto>("SELECT * FROM SpaceImage WHERE SpaceId IN @spaceIds", new { spaceIds = spaceIds });
                 }
 
                 foreach (SpaceDto space in spaces)
