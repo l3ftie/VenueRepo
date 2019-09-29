@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>VenueAPI</name>
+    </assembly>
+    <members>
+        <member name="M:VenueAPI.API.VenueController.AddVenueAsync(VLibraries.APIModels.Venue)">
+            <summary>
+            Add a Venue
+            </summary>
+            <param name="venue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.GetVenueAsync(System.Guid)">
+            <summary>
+            Get a Venue by its Id
+            </summary>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.GetVenuesAsync">
+            <summary>
+            Get all Venues
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.EditVenueAsync(VLibraries.APIModels.Venue,System.Guid)">
+            <summary>
+            Edit a Venue by its Id
+            </summary>
+            <param name="venue"></param>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.DeleteVenueAsync(System.Guid)">
+            <summary>
+            Delete a Venue by its Id
+            </summary>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.AddVenueImagesAsync(System.Collections.Generic.List{System.String},System.Guid)">
+            <summary>
+            Add Base64 encoded Image strings to a venue by the venueId
+            </summary>
+            <param name="base64EncodedVenueImages"></param>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.GetVenueImagesAsync(System.Guid)">
+            <summary>
+            Get Base64 encoded Image strings of a Venue by the venueId
+            </summary>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.DeleteVenueImagesAsync(System.Collections.Generic.List{System.Guid},System.Guid)">
+            <summary>
+            Delete Base64 encoded Image strings of a Venue by the venueId
+            </summary>
+            <param name="venueId"></param>
+            <param name="venueImageIds"></param>
+            <returns></returns>
+            [ProducesResponseType((int)HttpStatusCode.OK)]
+        </member>
+        <member name="M:VenueAPI.API.VenueController.AddSpaceAsync(VLibraries.APIModels.Space,System.Guid)">
+            <summary>
+            Add a Space to a Venue by the venueId
+            </summary>
+            <param name="space"></param>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.GetSpaceAsync(System.Guid,System.Guid)">
+            <summary>
+            Get a Space wtihin a Venue by its spaceId and by the venuId
+            </summary>
+            /// <param name="spaceId"></param>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.GetSpacesAsync(System.Guid)">
+            <summary>
+            Get all Spaces within a Venue by the venueId
+            </summary>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.EditSpaceAsync(VLibraries.APIModels.Space,System.Guid,System.Guid)">
+            <summary>
+            Edit a Space within a Venue by using the spaceId and venudId
+            </summary>
+            <param name="space"></param>
+            <param name="spaceId"></param>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.DeleteSpaceAsync(System.Guid,System.Guid)">
+            <summary>
+            Delete a Space within a Venue by using the spaceId and venudId
+            </summary>
+            <param name="spaceId"></param>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.AddSpaceImagesAsync(System.Collections.Generic.List{System.String},System.Guid,System.Guid)">
+            <summary>
+            Add Base64 encoded Image strings to a Space within a Venue by the spaceId and venueId
+            </summary>
+            <param name="base64EncodedVenueImages"></param>
+            <param name="venueId"></param>
+            <param name="spaceId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.GetSpaceImagesAsync(System.Guid,System.Guid)">
+            <summary>
+            Get Base64 encoded Image strings for a Space within a Venue by the spaceId and the venueId
+            </summary>
+            <param name="venueId"></param> 
+            <param name="spaceId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.VenueController.DeleteSpaceImagesAsync(System.Collections.Generic.List{System.Guid},System.Guid,System.Guid)">
+            <summary>
+            Delete Base64 encoded Image strings for a Space within a Venue by the imageIds, spaceId and venueId
+            </summary>
+            <param name="spaceImageIds"></param>
+            <param name="spaceId"></param>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

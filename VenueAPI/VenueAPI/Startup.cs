@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using Swashbuckle.AspNetCore.Swagger;
+using System.IO;
 using VenueAPI.BLL;
 using VenueAPI.DAL;
 using VLibraries.CommonMiddleware;
@@ -33,9 +34,13 @@ namespace VenueAPI
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddSwaggerGen(c =>
+            string xmlFilePath = Path.Combine(System.AppContext.BaseDirectory, "VenueAPI.xml");
+
+
+            services.AddSwaggerGen(option =>
             {
-                c.SwaggerDoc("v2", new Info { Title = "Venue API", Version = "v1.0" });
+                option.SwaggerDoc("v2", new Info { Title = "Venue API", Version = "v1.0" });
+                option.IncludeXmlComments(xmlFilePath);
             });
         }
 

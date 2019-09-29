@@ -42,48 +42,25 @@ namespace VenueAPI.DAL
                 if (insertedVenueId == Guid.Empty)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Venue:\n{JsonConvert.SerializeObject(venue)}");
 
-                bool addImagesResult = await AddVenueImagesAsync(venue.VenueImages, insertedVenueId);
-
-                return await GetVenueAsync(insertedVenueId);
+                return await GetVenueAsync(insertedVenueId, true);
             }
         }
-
-        public async Task<bool> AddVenueImagesAsync(List<VenueImage> venueImages, Guid venueId)
-        {
-            List<VenueImageDto> dtos = new List<VenueImageDto>();
-
-            foreach (VenueImage img in venueImages)
-            {
-                dtos.Add(new VenueImageDto
-                {
-                    Base64VenueImageString = img.Base64VenueImageString,
-                    VenueId = venueId
-                });
-            }
-
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                int resultCount = await con.InsertAsync(dtos);
-
-                if (resultCount == 0)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Venue Images:\n{JsonConvert.SerializeObject(venueImages)}\ninto Venue: {venueId}");
-
-                return true;
-            }
-        }
-
-        public async Task<VenueDto> GetVenueAsync(Guid venueId)
+        
+        public async Task<VenueDto> GetVenueAsync(Guid venueId, bool initialInsert = false)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                VenueDto dto = await con.GetAsync<VenueDto>(venueId);
+                VenueDto venueDto = await con.GetAsync<VenueDto>(venueId);
 
-                if (dto == null)
+                if (venueDto == null)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                dto.Spaces = await GetSpacesAsync(venueId);
+                venueDto.VenueImages = await GetVenueImagesAsync(venueId);
 
-                return dto;
+                if (!initialInsert)
+                    venueDto.Spaces = await GetSpacesAsync(venueId, initialInsert);
+
+                return venueDto;
             }
         }
 
@@ -91,18 +68,25 @@ namespace VenueAPI.DAL
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                IEnumerable<VenueDto> dtos = await con.GetAllAsync<VenueDto>();
+                IEnumerable<VenueDto> venueDtos = await con.GetAllAsync<VenueDto>();
 
-                if (dtos == null || dtos.Count() == 0)
+                foreach (VenueDto venue in venueDtos)
+                {
+                    venue.VenueImages = await GetVenueImagesAsync(venue.VenueId);
+
+                    venue.Spaces = await GetSpacesAsync(venue.VenueId, false);
+                }
+
+                if (venueDtos == null || venueDtos.Count() == 0)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                return dtos.ToList();
+                return venueDtos.ToList();
             }
         }
 
         public async Task<VenueDto> EditVenueAsync(Venue venue, Guid venueId)
         {
-            VenueDto dto = new VenueDto
+            VenueDto venueDto = new VenueDto
             {
                 VenueId = venueId,
                 Title = venue.Title,
@@ -117,14 +101,14 @@ namespace VenueAPI.DAL
 
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                bool result = await con.UpdateAsync(dto);
+                bool updateVenueResult = await con.UpdateAsync(venueDto);
 
-                if (!result)
+                if (!updateVenueResult)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
-                dto = await GetVenueAsync(venueId);
+                venueDto = await GetVenueAsync(venueId);
 
-                return dto;
+                return venueDto;
             }
         }
 
@@ -132,12 +116,75 @@ namespace VenueAPI.DAL
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                bool result = await con.DeleteAsync(new VenueDto { VenueId = venueId });
+                List<VenueImageDto> venueImageDtos = await GetVenueImagesAsync(venueId);
+
+                //Delete images first or foreign key constraint fails at DB level
+                bool deleteImagesResult = await con.DeleteAsync(venueImageDtos);
+
+                bool deleteVenueResult = await con.DeleteAsync(new VenueDto { VenueId = venueId });
+
+                if (!deleteVenueResult)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+
+                return deleteVenueResult;
+            }
+        }
+
+        public async Task<List<VenueImageDto>> AddVenueImagesAsync(List<string> base64EncodedVenueImages, Guid venueId)
+        {
+            List<VenueImageDto> venueImageDtos = new List<VenueImageDto>();
+
+            foreach (string img in base64EncodedVenueImages)
+            {
+                venueImageDtos.Add(new VenueImageDto
+                {
+                    Base64VenueImageString = img,
+                    VenueId = venueId
+                });
+            }
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                int resultCount = await con.InsertAsync(venueImageDtos);
+
+                if (resultCount == 0)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Venue Images:\n{JsonConvert.SerializeObject(venueImageDtos)}\ninto Venue: {venueId}");
+
+                venueImageDtos = await GetVenueImagesAsync(venueId);
+
+                return venueImageDtos;
+            }
+        }
+
+        public async Task<List<VenueImageDto>> GetVenueImagesAsync(Guid venueId)
+        {
+            string getVenueImagesByVenueIdSql = "SELECT * FROM VenueImage WHERE venueId = @venueId";
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                IEnumerable<VenueImageDto> venueImages = await con.QueryAsync<VenueImageDto>(getVenueImagesByVenueIdSql, new { venueId });
+
+                if (venueImages == null)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+
+                return venueImages.ToList();
+            }
+        }
+
+        public async Task<bool> DeleteVenueImagesAsync(List<Guid> venueImageIds, Guid venueId)
+        {
+            List<VenueImageDto> venueImageDtos = new List<VenueImageDto>();
+
+            venueImageIds.ForEach(x => venueImageDtos.Add(new VenueImageDto { VenueId = venueId, VenueImageId = x }));
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                bool result = await con.DeleteAsync(venueImageDtos);
 
                 if (!result)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
-                return result;
+                return true;
             }
         }
 
@@ -146,16 +193,15 @@ namespace VenueAPI.DAL
         {
             string insertSpaceSql =
             "DECLARE @TempTable table([SpaceId] [uniqueidentifier]); " +
-            "INSERT INTO Space (MaxCapacity, VenueId, SpaceTypeId) " +
+            "INSERT INTO Space (MaxCapacity, VenueId) " +
             "   OUTPUT INSERTED.[SpaceId] INTO @TempTable " +
-            "VALUES (@MaxCapacity, @VenueId, @SpaceTypeId);" +
+            "VALUES (@MaxCapacity, @VenueId);" +
             "SELECT [SpaceId] FROM @TempTable;";
 
             SpaceDto spaceDto = new SpaceDto
             {
                 VenueId = venueId,
-                MaxCapacity = space.MaxCapacity,                
-                SpaceType = space.SpaceType
+                MaxCapacity = space.MaxCapacity
             };            
 
             using (SqlConnection con = new SqlConnection(_connectionString))
@@ -165,68 +211,77 @@ namespace VenueAPI.DAL
                 if (insertedSpaceId == Guid.Empty)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Space:\n{JsonConvert.SerializeObject(space)}\ninto Venue: {venueId}");
 
-                await AddSpaceImagesAsync(space.SpaceImages, insertedSpaceId);
-
-                return await GetSpaceAsync(venueId);
+                return await GetSpaceAsync(venueId, insertedSpaceId, false);
             }
         }
 
-        public async Task<SpaceDto> GetSpaceAsync(Guid spaceId)
+        public async Task<SpaceDto> GetSpaceAsync(Guid venueId, Guid spaceId, bool requestSpecificallyForSpaces = true)
         {
+            string getSpaceByIdSql = "SELECT * FROM Space WHERE spaceId = @spaceId";
+
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                SpaceDto space = await con.GetAsync<SpaceDto>(spaceId);
+                SpaceDto space = await con.QueryFirstAsync<SpaceDto>(getSpaceByIdSql, new { spaceId });
 
-                if (space == null)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+                if (space == null && requestSpecificallyForSpaces)
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                space.SpaceImages = await GetSpaceImagesAsync(spaceId);
+                space.SpaceImages = await GetSpaceImagesAsync(venueId, spaceId, requestSpecificallyForSpaces);
 
                 return space;
             }
         }
 
-        public async Task<List<SpaceDto>> GetSpacesAsync(Guid venueId)
+        public async Task<List<SpaceDto>> GetSpacesAsync(Guid venueId, bool requestSpecificallyForSpaces = true)
         {
+            string getSpacesByVenueIdSql = "SELECT * FROM Space WHERE venueId = @venueId";
+
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                List<SpaceDto> spaces = await con.GetAsync<List<SpaceDto>>(venueId);
+                IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>(getSpacesByVenueIdSql, new { venueId });
 
-                if (spaces == null || spaces.Count == 0)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+                if (spaces == null || (requestSpecificallyForSpaces && spaces.Count() == 0))
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                return spaces;
+                foreach(SpaceDto space in spaces)
+                {
+                    space.SpaceImages = await GetSpaceImagesAsync(venueId, space.SpaceId, false);
+                }
+
+                return spaces.ToList();
             }
         }
 
-        public async Task<SpaceDto> EditSpaceAsync(Space space, Guid spaceId, Guid venueId)
+        public async Task<SpaceDto> EditSpaceAsync(Space space, Guid venueId, Guid spaceId)
         {
             SpaceDto dto = new SpaceDto
             {
                 SpaceId = spaceId,
                 VenueId = venueId,
-                MaxCapacity = space.MaxCapacity,
-                SpaceType = space.SpaceType
+                MaxCapacity = space.MaxCapacity
             };
 
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                bool result = await con.UpdateAsync(dto);
+                bool updateSpaceResult = await con.UpdateAsync(dto);
 
-                if (!result)
+                if (!updateSpaceResult)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
-                dto = await GetSpaceAsync(spaceId);
+                dto = await GetSpaceAsync(venueId, spaceId);
 
                 return dto;
             }
         }
 
-
-        public async Task<bool> DeleteSpaceAsync(Guid spaceId, Guid venueId)
+        public async Task<bool> DeleteSpaceAsync(Guid venueId, Guid spaceId)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
+                List<SpaceImageDto> spaceImageDtos = await GetSpaceImagesAsync(venueId, spaceId);
+
+                bool result1 = await con.DeleteAsync(spaceImageDtos);
+
                 bool result = await con.DeleteAsync(new SpaceDto { SpaceId = spaceId, VenueId = venueId });
 
                 if (!result)
@@ -235,48 +290,49 @@ namespace VenueAPI.DAL
                 return result;
             }
         }
-                
 
-        public async Task<List<SpaceImageDto>> AddSpaceImagesAsync(List<SpaceImage> spaceImages, Guid spaceId)
+        public async Task<List<SpaceImageDto>> AddSpaceImagesAsync(List<string> base64EncodedVenueImages, Guid venueId, Guid spaceId)
         {
-            List<SpaceImageDto> dtos = new List<SpaceImageDto>();
+            List<SpaceImageDto> spaceImageDtos = new List<SpaceImageDto>();
 
-            foreach (SpaceImage img in spaceImages)
+            foreach (string img in base64EncodedVenueImages)
             {
-                dtos.Add(new SpaceImageDto
+                spaceImageDtos.Add(new SpaceImageDto
                 {
-                    Base64SpaceImageString = img.Base64SpaceImageString,
+                    Base64SpaceImageString = img,
                     SpaceId = spaceId
                 });
             }
 
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                int resultCount = await con.InsertAsync(dtos);
+                int resultCount = await con.InsertAsync(spaceImageDtos);
 
                 if (resultCount == 0)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Space Images:\n{JsonConvert.SerializeObject(spaceImages)}\ninto Space: {spaceId}");
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Space Images:\n{JsonConvert.SerializeObject(spaceImageDtos)}\ninto Space: {spaceId}");
 
-                List<SpaceImageDto> refreshedSpaceImages = await GetSpaceImagesAsync(spaceId);
+                spaceImageDtos = await GetSpaceImagesAsync(venueId, spaceId);
 
-                return refreshedSpaceImages;
+                return spaceImageDtos;
             }
         }
 
-        public async Task<List<SpaceImageDto>> GetSpaceImagesAsync(Guid spaceId)
+        public async Task<List<SpaceImageDto>> GetSpaceImagesAsync(Guid venueId, Guid spaceId, bool requestSpecificallyForSpaceImages = true)
         {
+            string getSpaceImagesBySpaceIdSql = "SELECT * FROM SpaceImage WHERE spaceId = @spaceId";
+
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                List<SpaceImageDto> spaceImages = await con.GetAsync<List<SpaceImageDto>>(spaceId);
+                IEnumerable<SpaceImageDto> spaceImages = await con.QueryAsync<SpaceImageDto>(getSpaceImagesBySpaceIdSql, new { spaceId });
 
-                if (spaceImages == null || spaceImages.Count == 0)
+                if (spaceImages == null || (requestSpecificallyForSpaceImages && spaceImages.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
-                return spaceImages;
+                return spaceImages.ToList();
             }
         }
 
-        public async Task<bool> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid spaceId)
+        public async Task<bool> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid venueId, Guid spaceId)
         {
             List<SpaceImageDto> spaceImageDtos = new List<SpaceImageDto>();
 

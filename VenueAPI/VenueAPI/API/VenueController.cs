@@ -23,7 +23,13 @@ namespace VenueAPI.API
             _venueProvider = venueProvider;
         }
 
+
         #region Venues
+        /// <summary>
+        /// Add a Venue
+        /// </summary>
+        /// <param name="venue"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -38,6 +44,11 @@ namespace VenueAPI.API
             return new ResponseBase<VenueDto>(result);
         }
 
+        /// <summary>
+        /// Get a Venue by its Id
+        /// </summary>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -52,6 +63,10 @@ namespace VenueAPI.API
             return new ResponseBase<VenueDto>(result);
         }
 
+        /// <summary>
+        /// Get all Venues
+        /// </summary>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -66,6 +81,12 @@ namespace VenueAPI.API
             return new ResponseBase<List<VenueDto>>(result);
         }
 
+        /// <summary>
+        /// Edit a Venue by its Id
+        /// </summary>
+        /// <param name="venue"></param>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
@@ -81,6 +102,11 @@ namespace VenueAPI.API
             return new ResponseBase<VenueDto>(result);
         }
 
+        /// <summary>
+        /// Delete a Venue by its Id
+        /// </summary>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
@@ -97,14 +123,83 @@ namespace VenueAPI.API
         }
         #endregion
 
-
+        #region Venue Images
+        /// <summary>
+        /// Add Base64 encoded Image strings to a venue by the venueId
+        /// </summary>
+        /// <param name="base64EncodedVenueImages"></param>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpPost]
-        [Route("{venueId}")]
+        [Route("{venueId}/Images")]
+        [CustomModelStateValidation]
+        public async Task<ActionResult<ResponseBase<List<VenueImageDto>>>> AddVenueImagesAsync(List<string> base64EncodedVenueImages, Guid venueId)
+        {
+            List<VenueImageDto> results = await _venueProvider.AddVenueImagesAsync(base64EncodedVenueImages, venueId);
+
+            return new ResponseBase<List<VenueImageDto>>(results);
+        }
+
+        /// <summary>
+        /// Get Base64 encoded Image strings of a Venue by the venueId
+        /// </summary>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [HttpGet]
+        [Route("{venueId}/Images")]
+        [CustomModelStateValidation]
+        public async Task<ActionResult<ResponseBase<List<VenueImageDto>>>> GetVenueImagesAsync(Guid venueId)
+        {
+            List<VenueImageDto> results = await _venueProvider.GetVenueImagesAsync(venueId);
+
+            return new ResponseBase<List<VenueImageDto>>(results);
+        }
+
+        /// <summary>
+        /// Delete Base64 encoded Image strings of a Venue by the venueId
+        /// </summary>
+        /// <param name="venueId"></param>
+        /// <param name="venueImageIds"></param>
+        /// <returns></returns>
+        /// [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.NotModified)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [HttpDelete]
+        [Route("{venueId}/Images")]
+        [CustomModelStateValidation]
+        public async Task<ActionResult<ResponseBase<bool>>> DeleteVenueImagesAsync(List<Guid> venueImageIds, Guid venueId)
+        {
+            bool result = await _venueProvider.DeleteVenueImagesAsync(venueImageIds, venueId);
+
+            return new ResponseBase<bool>(result);
+        }
+        #endregion
+
+        #region Spaces
+        /// <summary>
+        /// Add a Space to a Venue by the venueId
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.NotModified)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [HttpPost]
+        [Route("{venueId}/Spaces")]
         [CustomModelStateValidation]
         public async Task<ActionResult<ResponseBase<SpaceDto>>> AddSpaceAsync([FromBody] Space space, Guid venueId)
         {
@@ -113,20 +208,31 @@ namespace VenueAPI.API
             return new ResponseBase<SpaceDto>(result);
         }
 
+        /// <summary>
+        /// Get a Space wtihin a Venue by its spaceId and by the venuId
+        /// </summary>
+        /// /// <param name="spaceId"></param>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpGet]
-        [Route("{spaceId}")]
+        [Route("{venueId}/Spaces/{spaceId}")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<SpaceDto>>> GetSpaceAsync(Guid spaceId)
+        public async Task<ActionResult<ResponseBase<SpaceDto>>> GetSpaceAsync(Guid venueId, Guid spaceId)
         {
-            SpaceDto result = await _venueProvider.GetSpaceAsync(spaceId);
+            SpaceDto result = await _venueProvider.GetSpaceAsync(venueId, spaceId);
 
             return new ResponseBase<SpaceDto>(result);
         }
 
+        /// <summary>
+        /// Get all Spaces within a Venue by the venueId
+        /// </summary>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -141,75 +247,111 @@ namespace VenueAPI.API
             return new ResponseBase<List<SpaceDto>> (results);
         }
 
+        /// <summary>
+        /// Edit a Space within a Venue by using the spaceId and venudId
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="spaceId"></param>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpPatch]
         [Route("{venueId}/Spaces/{spaceId}")]
-        public async Task<ActionResult<ResponseBase<SpaceDto>>> EditSpaceAsync([FromBody] Space venue, Guid spaceId, Guid venueId)
+        public async Task<ActionResult<ResponseBase<SpaceDto>>> EditSpaceAsync([FromBody] Space space, Guid venueId, Guid spaceId)
         {
-            SpaceDto result = await _venueProvider.EditSpaceAsync(venue, spaceId, venueId);
+            SpaceDto result = await _venueProvider.EditSpaceAsync(space, venueId, spaceId);
 
             return new ResponseBase<SpaceDto>(result);
         }
 
+        /// <summary>
+        /// Delete a Space within a Venue by using the spaceId and venudId
+        /// </summary>
+        /// <param name="spaceId"></param>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [HttpGet]
+        [HttpDelete]
         [Route("{venueId}/Spaces/{spaceId}")]
-        public async Task<ActionResult<ResponseBase<bool>>> DeleteSpaceAsync(Guid spaceId, Guid venueId)
+        public async Task<ActionResult<ResponseBase<bool>>> DeleteSpaceAsync(Guid venueId, Guid spaceId)
         {
-            bool result = await _venueProvider.DeleteSpaceAsync(spaceId, venueId);
+            bool result = await _venueProvider.DeleteSpaceAsync(venueId, spaceId);
 
             return new ResponseBase<bool>(result);
         }
+        #endregion
 
 
+        #region Space Images
+        /// <summary>
+        /// Add Base64 encoded Image strings to a Space within a Venue by the spaceId and venueId
+        /// </summary>
+        /// <param name="base64EncodedVenueImages"></param>
+        /// <param name="venueId"></param>
+        /// <param name="spaceId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpPost]
-        [Route("Images/{spaceId}")]
+        [Route("{venueId}/Spaces/{spaceId}/Images")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<List<SpaceImageDto>>>> AddSpaceImagesAsync(List<SpaceImage> spaceImages, Guid spaceId)
+        public async Task<ActionResult<ResponseBase<List<SpaceImageDto>>>> AddSpaceImagesAsync(List<string> base64EncodedVenueImages, Guid venueId, Guid spaceId)
         {
-            List<SpaceImageDto> results = await _venueProvider.AddSpaceImagesAsync(spaceImages, spaceId);
+            List<SpaceImageDto> results = await _venueProvider.AddSpaceImagesAsync(base64EncodedVenueImages, venueId, spaceId);
 
             return new ResponseBase<List<SpaceImageDto>>(results);
         }
 
+        /// <summary>
+        /// Get Base64 encoded Image strings for a Space within a Venue by the spaceId and the venueId
+        /// </summary>
+        /// <param name="venueId"></param> 
+        /// <param name="spaceId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpGet]
-        [Route("Images/{spaceId}")]
+        [Route("{venueId}/Spaces/{spaceId}/Images")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<List<SpaceImageDto>>>> GetSpaceImagesAsync(Guid spaceId)
+        public async Task<ActionResult<ResponseBase<List<SpaceImageDto>>>> GetSpaceImagesAsync(Guid venueId, Guid spaceId)
         {
-            List<SpaceImageDto> results = await _venueProvider.GetSpaceImagesAsync(spaceId);
+            List<SpaceImageDto> results = await _venueProvider.GetSpaceImagesAsync(venueId, spaceId);
 
             return new ResponseBase<List<SpaceImageDto>>(results);
         }
 
+        /// <summary>
+        /// Delete Base64 encoded Image strings for a Space within a Venue by the imageIds, spaceId and venueId
+        /// </summary>
+        /// <param name="spaceImageIds"></param>
+        /// <param name="spaceId"></param>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpDelete]
-        [Route("Images/{spaceId}")]
+        [Route("{venueId}/Spaces/{spaceId}/Images")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<bool>>> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid spaceId)
+        public async Task<ActionResult<ResponseBase<bool>>> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid venueId, Guid spaceId)
         {
-            bool result = await _venueProvider.DeleteSpaceImagesAsync(spaceImageIds, spaceId);
+            bool result = await _venueProvider.DeleteSpaceImagesAsync(spaceImageIds, venueId, spaceId);
 
             return new ResponseBase<bool>(result);
         }
+        #endregion
     }
 }

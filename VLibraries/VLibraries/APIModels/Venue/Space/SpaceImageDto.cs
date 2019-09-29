@@ -6,8 +6,9 @@ namespace VLibraries.APIModels
     [Table("SpaceImage")]
     public class SpaceImageDto : SpaceImage
     {
-        [ExplicitKey]
+        [Key]
         public Guid SpaceImageId { get; set; }
+        [ExplicitKey]
         public Guid SpaceId { get; set; }
     }
 }

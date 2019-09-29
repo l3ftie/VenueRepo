@@ -13,6 +13,5 @@ namespace VLibraries.APIModels
         public string TestimonialContactOrganisation { get; set; }
         public string TestimonialContactEmail { get; set; }
         public string MUrl { get; set; }
-        public List<VenueImage> VenueImages { get; set; }
     }
 }

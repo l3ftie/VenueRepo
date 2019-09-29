@@ -6,6 +6,11 @@
     <UserSecretsId>2cd63588-0a07-49fa-8808-1ed9a98bc9d6</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\Jord\Source\Repos\VenueRepo\VenueAPI\VenueAPI\VenueAPI.xml</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Dapper.Contrib" Version="2.0.30" />
     <PackageReference Include="Microsoft.AspNetCore.App" />

@@ -7,7 +7,7 @@ namespace VLibraries.APIModels
     [Table("Venue")]
     public class VenueDto : Venue
     {
-        [ExplicitKey]
+        [Key]
         public Guid VenueId { get; set; }
 
         [Write(false)]

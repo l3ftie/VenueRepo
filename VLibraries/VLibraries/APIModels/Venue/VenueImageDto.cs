@@ -6,8 +6,10 @@ namespace VLibraries.APIModels
     [Table("VenueImage")]
     public class VenueImageDto : VenueImage
     {
-        [ExplicitKey]
+        [Key]
         public Guid VenueImageId { get; set; }
+
+        [ExplicitKey]
         public Guid VenueId { get; set; }
     }
 }

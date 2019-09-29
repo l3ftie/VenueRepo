@@ -7,11 +7,16 @@ namespace VLibraries.APIModels
     [Table("Space")]
     public class SpaceDto : Space
     {
-        [ExplicitKey]
+        [Key]
         public Guid SpaceId { get; set; }
+
+        [ExplicitKey]
         public Guid VenueId { get; set; }
 
         [Write(false)]
-        public new List<SpaceImageDto> SpaceImages { get; set; }
+        public List<SpaceImageDto> SpaceImages { get; set; }
+
+        [Write(false)]
+        public SpaceTypeDto SpaceType { get; set; }
     }
 }

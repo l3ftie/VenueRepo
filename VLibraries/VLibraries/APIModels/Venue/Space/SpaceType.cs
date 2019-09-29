@@ -1,7 +1,8 @@
 ﻿namespace VLibraries.APIModels
 {
-    public enum SpaceType
+
+    public class SpaceType
     {
-        TABLE = 1
+        public string Description { get; set; }
     }
 }

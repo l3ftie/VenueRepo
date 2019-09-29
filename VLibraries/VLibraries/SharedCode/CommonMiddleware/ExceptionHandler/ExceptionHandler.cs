@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VLibraries.CustomExceptions;
 using VLibraries.Errors;
 using VLibraries.ExceptionHadler;
+using VLibraries.Extensions;
 using VLibraries.ResponseModels;
 
 namespace VLibraries.ExceptionHandler
@@ -38,7 +39,9 @@ namespace VLibraries.ExceptionHandler
             {
                 Error = new Error
                 {
-                    Message = exception.CustomMessage == null ? "There was a problem processing the Request": exception.CustomMessage,
+                    Message = exception.CustomMessage == null 
+                    ? exception.HttpStatusCode.GetResponseMessageFromHttpStatusCode() 
+                    : exception.CustomMessage,
                     Target = $"{exception.TargetSite.DeclaringType}",
                     InnerError = exception.InnerError
                 }
