@@ -11,38 +11,41 @@ using VLibraries.VenueAPI;
 
 namespace VenueAPI.API
 {
-    [Route("Venues")]
-    public class VenueController : Controller, IVenueService
+    [Route("Venues/{venueId}/Spaces")]
+    public class SpaceController : Controller, ISpaceService
     {
-        private readonly IVenueProvider _venueProvider;
+        private readonly ISpaceProvider _spaceProvider;
 
-        public VenueController(IVenueProvider venueProvider)
+        public SpaceController(ISpaceProvider spaceProvider)
         {
-            _venueProvider = venueProvider;
+            _spaceProvider = spaceProvider;
         }
 
         /// <summary>
-        /// Add a Venue
+        /// Add a Space to a Venue by the venueId
         /// </summary>
-        /// <param name="venue"></param>
+        /// <param name="space"></param>
+        /// <param name="venueId"></param>
         /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpPost]
         [Route("")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> AddVenueAsync([FromBody] Venue venue)
+        public async Task<ActionResult<ResponseBase<SpaceDto>>> AddSpaceAsync([FromBody] Space space, Guid venueId)
         {
-            VenueDto result = await _venueProvider.AddVenueAsync(venue);
+            SpaceDto result = await _spaceProvider.AddSpaceAsync(space, venueId);
 
-            return new ResponseBase<VenueDto>(result);
+            return new ResponseBase<SpaceDto>(result);
         }
 
         /// <summary>
-        /// Get a Venue by its Id
+        /// Get a Space wtihin a Venue by its spaceId and by the venuId
         /// </summary>
+        /// /// <param name="spaceId"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -50,18 +53,19 @@ namespace VenueAPI.API
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpGet]
-        [Route("{venueId}")]
+        [Route("{spaceId}")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> GetVenueAsync(Guid venueId)
+        public async Task<ActionResult<ResponseBase<SpaceDto>>> GetSpaceAsync(Guid venueId, Guid spaceId)
         {
-            VenueDto result = await _venueProvider.GetVenueAsync(venueId);
+            SpaceDto result = await _spaceProvider.GetSpaceAsync(venueId, spaceId);
 
-            return new ResponseBase<VenueDto>(result);
+            return new ResponseBase<SpaceDto>(result);
         }
 
         /// <summary>
-        /// Get all Venues
+        /// Get all Spaces within a Venue by the venueId
         /// </summary>
+        /// <param name="venueId"></param>
         /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -70,52 +74,50 @@ namespace VenueAPI.API
         [HttpGet]
         [Route("")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<List<VenueDto>>>> GetVenuesAsync()
+        public async Task<ActionResult<ResponseBase<List<SpaceDto>>>> GetSpacesAsync(Guid venueId)
         {
-            List<VenueDto> result = await _venueProvider.GetVenuesAsync();
+            List<SpaceDto> results = await _spaceProvider.GetSpacesAsync(venueId);
 
-            return new ResponseBase<List<VenueDto>>(result);
+            return new ResponseBase<List<SpaceDto>>(results);
         }
 
         /// <summary>
-        /// Edit a Venue by its Id
+        /// Edit a Space within a Venue by using the spaceId and venudId
         /// </summary>
-        /// <param name="venue"></param>
+        /// <param name="space"></param>
+        /// <param name="spaceId"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpPatch]
-        [Route("{venueId}")]
-        [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> EditVenueAsync([FromBody] Venue venue, Guid venueId)
+        [Route("{spaceId}")]
+        public async Task<ActionResult<ResponseBase<SpaceDto>>> EditSpaceAsync([FromBody] Space space, Guid venueId, Guid spaceId)
         {
-            VenueDto result = await _venueProvider.EditVenueAsync(venue, venueId);
+            SpaceDto result = await _spaceProvider.EditSpaceAsync(space, venueId, spaceId);
 
-            return new ResponseBase<VenueDto>(result);
+            return new ResponseBase<SpaceDto>(result);
         }
 
         /// <summary>
-        /// Delete a Venue by its Id
+        /// Delete a Space within a Venue by using the spaceId and venudId
         /// </summary>
+        /// <param name="spaceId"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpDelete]
-        [Route("")]
-        [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<bool>>> DeleteVenueAsync(Guid venueId)
+        [Route("{spaceId}")]
+        public async Task<ActionResult<ResponseBase<bool>>> DeleteSpaceAsync(Guid venueId, Guid spaceId)
         {
-            bool result = await _venueProvider.DeleteVenueAsync(venueId);
+            bool result = await _spaceProvider.DeleteSpaceAsync(venueId, spaceId);
 
             return new ResponseBase<bool>(result);
-        }        
+        }
     }
 }
