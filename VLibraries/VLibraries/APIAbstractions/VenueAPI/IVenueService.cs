@@ -15,6 +15,14 @@ namespace VLibraries.VenueService
         Task<ActionResult<ResponseBase<VenueDto>>> EditVenueAsync([FromBody] Venue venue, Guid venueId);
         Task<ActionResult<ResponseBase<bool>>> DeleteVenueAsync(Guid venueId);        
 
-        Task<ActionResult<ResponseBase<VenueDto>>> AddSpaceAsync([FromBody] Space venue, Guid venueId);
+        Task<ActionResult<ResponseBase<SpaceDto>>> AddSpaceAsync([FromBody] Space venue, Guid venueId);
+        Task<ActionResult<ResponseBase<SpaceDto>>> GetSpaceAsync(Guid spaceId);
+        Task<ActionResult<ResponseBase<List<SpaceDto>>>> GetSpacesAsync(Guid venueId);
+        Task<ActionResult<ResponseBase<SpaceDto>>> EditSpaceAsync([FromBody] Space venue, Guid spaceId, Guid venueId);
+        Task<ActionResult<ResponseBase<bool>>> DeleteSpaceAsync(Guid spaceId, Guid venueId);
+
+        Task<ActionResult<ResponseBase<List<SpaceImageDto>>>> AddSpaceImagesAsync(List<SpaceImage> spaceImages, Guid spaceId);
+        Task<ActionResult<ResponseBase<List<SpaceImageDto>>>> GetSpaceImagesAsync(Guid spaceId);
+        Task<ActionResult<ResponseBase<bool>>> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid spaceId);
     }
 }

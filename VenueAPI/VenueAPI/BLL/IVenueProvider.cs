@@ -13,6 +13,14 @@ namespace VenueAPI.BLL
         Task<VenueDto> EditVenueAsync(Venue venue, Guid venueId);
         Task<bool> DeleteVenueAsync(Guid venueId);
 
-        Task<VenueDto> AddSpaceAsync(Space venue, Guid venueId);
+        Task<SpaceDto> AddSpaceAsync(Space venue, Guid venueId);
+        Task<SpaceDto> GetSpaceAsync(Guid spaceId);
+        Task<List<SpaceDto>> GetSpacesAsync(Guid venueId);
+        Task<SpaceDto> EditSpaceAsync(Space space, Guid spaceId, Guid venueId);
+        Task<bool> DeleteSpaceAsync(Guid spaceId, Guid venueId);
+
+        Task<List<SpaceImageDto>> AddSpaceImagesAsync(List<SpaceImage> spaceImages, Guid spaceId);
+        Task<List<SpaceImageDto>> GetSpaceImagesAsync(Guid spaceId);
+        Task<bool> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid spaceId);
     }
 }

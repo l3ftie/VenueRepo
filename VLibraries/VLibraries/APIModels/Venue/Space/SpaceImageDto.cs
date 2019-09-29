@@ -4,7 +4,7 @@ using System;
 namespace VLibraries.APIModels
 {
     [Table("SpaceImage")]
-    public class SpaceImageDto : VenueImage
+    public class SpaceImageDto : SpaceImage
     {
         [ExplicitKey]
         public Guid SpaceImageId { get; set; }
