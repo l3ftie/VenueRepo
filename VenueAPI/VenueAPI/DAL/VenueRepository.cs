@@ -127,22 +127,14 @@ namespace VenueAPI.DAL
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                //Delete images first or foreign key constraint fails at DB level
+                //Delete in Order sos as not to violate SQL table constraints
+                List<SpaceDto> spaceDtos = await _spaceRepo.GetSpacesAsync(venueId, false);
+
+                spaceDtos.ForEach(async space => await _spaceRepo.DeleteSpaceAsync(venueId, space.SpaceId));
+                
                 List<VenueImageDto> venueImageDtos = await _venueImageRepo.GetVenueImagesAsync(venueId, false);
                 if (venueImageDtos.Count() > 0)
                     await con.DeleteAsync(venueImageDtos);
-
-                List<SpaceDto> spaceDtos = await _spaceRepo.GetSpacesAsync(venueId, false);
-
-                foreach (SpaceDto space in spaceDtos)
-                {
-                    List<SpaceImageDto> spaceImageDtos = await _spaceImageRepo.GetSpaceImagesAsync(venueId, space.SpaceId);
-                    if (spaceImageDtos.Count() > 0)
-                        await con.DeleteAsync(spaceImageDtos);
-                }
-
-                if (spaceDtos.Count() > 0)
-                    await con.DeleteAsync(spaceDtos);
 
                 bool deleteVenueResult = await con.DeleteAsync(new VenueDto { VenueId = venueId });
                 if (!deleteVenueResult)
