@@ -12,5 +12,8 @@ namespace VenueAPI.DAL
         Task<List<SpaceDto>> GetSpacesAsync(Guid venueId, bool requestSpecificallyForSpaces = true);
         Task<SpaceDto> EditSpaceAsync(Space venue, Guid venueId, Guid spaceId);
         Task<bool> DeleteSpaceAsync(Guid venueId, Guid spaceId);
+
+
+        Task<List<SpaceDto>> GetSpacesAsync(List<Guid> venueIds, bool requestSpecificallyForSpaces = true); //Not exposed at API Level
     }
 }

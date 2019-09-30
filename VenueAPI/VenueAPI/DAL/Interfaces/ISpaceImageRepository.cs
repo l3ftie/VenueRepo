@@ -10,5 +10,8 @@ namespace VenueAPI.DAL
         Task<List<SpaceImageDto>> AddSpaceImagesAsync(List<string> base64EncodedVenueImages, Guid venueId, Guid spaceId);
         Task<List<SpaceImageDto>> GetSpaceImagesAsync(Guid venueId, Guid spaceId, bool requestSpecificallyForSpaceImages = true);
         Task<bool> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid venueId, Guid spaceId);
+
+
+        Task<List<SpaceImageDto>> GetSpaceImagesAsync(List<Guid> spaceIds, bool requestSpecificallyForSpaceImages = true); //Not exposed at API Level
     }
 }

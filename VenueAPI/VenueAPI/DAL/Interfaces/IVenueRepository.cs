@@ -10,7 +10,7 @@ namespace VenueAPI.DAL
     public interface IVenueRepository
     {
         Task<VenueDto> AddVenueAsync(Venue venue);
-        Task<VenueDto> GetVenueAsync(Guid id, bool initialInsert = false);
+        Task<VenueDto> GetVenueAsync(Guid id);
         Task<List<VenueDto>> GetVenuesAsync();
         Task<VenueDto> EditVenueAsync(Venue venue, Guid id);
         Task<bool> DeleteVenueAsync(Guid id);

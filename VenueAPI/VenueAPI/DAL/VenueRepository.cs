@@ -45,11 +45,11 @@ namespace VenueAPI.DAL
                 if (insertedVenueId == Guid.Empty)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Venue:\n{JsonConvert.SerializeObject(venue)}");
 
-                return await GetVenueAsync(insertedVenueId, true);
+                return await GetVenueAsync(insertedVenueId);
             }
         }
         
-        public async Task<VenueDto> GetVenueAsync(Guid venueId, bool initialInsert = false)
+        public async Task<VenueDto> GetVenueAsync(Guid venueId)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
@@ -58,10 +58,9 @@ namespace VenueAPI.DAL
                 if (venueDto == null)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                venueDto.VenueImages = await _venueImageRepo.GetVenueImagesAsync(venueId);
+                venueDto.VenueImages = await _venueImageRepo.GetVenueImagesAsync(venueId, false);
 
-                if (!initialInsert)
-                    venueDto.Spaces = await _spaceRepo.GetSpacesAsync(venueId, initialInsert);
+                venueDto.Spaces = await _spaceRepo.GetSpacesAsync(venueId, false);
 
                 return venueDto;
             }
@@ -69,10 +68,6 @@ namespace VenueAPI.DAL
 
         public async Task<List<VenueDto>> GetVenuesAsync()
         {
-            IEnumerable<VenueImageDto> venueImages = new List<VenueImageDto>();
-
-            IEnumerable<SpaceDto> spaces = new List<SpaceDto>();
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<VenueDto> venueDtos = await con.GetAllAsync<VenueDto>();
@@ -80,29 +75,18 @@ namespace VenueAPI.DAL
                 if (venueDtos == null || venueDtos.Count() == 0)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                //Gather Venues with matching Ids 
-                IEnumerable <Guid> venueImageIds = venueDtos.Select(x => x.VenueId);
+                List<Guid> venueIds = venueDtos.Select(x => x.VenueId).ToList();
 
-                if (venueImageIds.Count() > 0)
-                {
-                    venueImages = await con.QueryAsync<VenueImageDto>("SELECT * FROM VenueImage WHERE VenueId IN @venueIds", new { venueIds = venueImageIds });
-                }
+                IEnumerable<VenueImageDto> venueImages = await _venueImageRepo.GetVenueImagesAsync(venueIds, false);
 
-                //Gather Spaces with matching Ids 
-                List<Guid> spaceIds = new List<Guid>();
-
-                venueDtos.Select(x => x.Spaces).ToList().ForEach(y => y.ForEach(t => spaceIds.Add(t.SpaceId)));
-                if (spaceIds.Count > 0)
-                {
-                    spaces = await con.QueryAsync<SpaceDto>("SELECT * FROM Space WHERE SpaceId IN @spaceIds", new { spaceIds });
-                }
+                IEnumerable<SpaceDto> spaces = await _spaceRepo.GetSpacesAsync(venueIds, false);
 
                 //Map to Models
                 foreach (VenueDto venue in venueDtos)
                 {
-                    venue.VenueImages = venueImages.Where(x => x.VenueId == venue.VenueId).ToList();
+                    venue.VenueImages = venueImages.Where(x => x?.VenueId == venue.VenueId).ToList();
 
-                    venue.Spaces = spaces.Where(x => x.VenueId == venue.VenueId).ToList();
+                    venue.Spaces = spaces.Where(x => x?.VenueId == venue.VenueId).ToList();
                 }
 
                 return venueDtos.ToList();

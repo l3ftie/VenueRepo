@@ -69,8 +69,6 @@ namespace VenueAPI.DAL
 
         public async Task<List<SpaceDto>> GetSpacesAsync(Guid venueId, bool requestSpecificallyForSpaces = true)
         {
-            IEnumerable<SpaceImageDto> spaceImages = new List<SpaceImageDto>();
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>("SELECT * FROM Space WHERE venueId = @venueId", new { venueId });
@@ -78,21 +76,18 @@ namespace VenueAPI.DAL
                 if (spaces == null || (requestSpecificallyForSpaces && spaces.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                IEnumerable<Guid> spaceIds = spaces.Select(x => x.SpaceId);
-                if (spaceIds.Count() > 0)
-                {
-                    spaceImages = await con.QueryAsync<SpaceImageDto>("SELECT * FROM SpaceImage WHERE SpaceId IN @spaceIds", new { spaceIds = spaceIds });
-                }
+                IEnumerable<SpaceImageDto> spaceImages = await _spaceImagesRepo.GetSpaceImagesAsync(spaces.Select(x => x.SpaceId).ToList(), false);             
 
+                //Map to Model
                 foreach (SpaceDto space in spaces)
                 {
-                    space.SpaceImages = spaceImages.Where(x => x.SpaceId == space.SpaceId).ToList();
+                    space.SpaceImages = spaceImages.Where(x => x?.SpaceId == space.SpaceId).ToList();
                 }
 
                 return spaces.ToList();
             }
         }
-
+        
         public async Task<SpaceDto> EditSpaceAsync(Space space, Guid venueId, Guid spaceId)
         {
             SpaceDto dto = new SpaceDto
@@ -129,6 +124,28 @@ namespace VenueAPI.DAL
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
                 return result;
+            }
+        }
+
+
+        public async Task<List<SpaceDto>> GetSpacesAsync(List<Guid> venueIds, bool requestSpecificallyForSpaces = true)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>("SELECT * FROM Space WHERE venueId IN @venueIds", new { venueIds });
+
+                if (spaces == null || (requestSpecificallyForSpaces && spaces.Count() == 0))
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
+
+                IEnumerable<SpaceImageDto> spaceImages = await _spaceImagesRepo.GetSpaceImagesAsync(spaces.Select(x => x.SpaceId).ToList(), false);         
+
+                //Map to Model
+                foreach (SpaceDto space in spaces)
+                {
+                    space.SpaceImages = spaceImages.Where(x => x?.SpaceId == space.SpaceId).ToList();
+                }
+
+                return spaces.ToList();
             }
         }
     }

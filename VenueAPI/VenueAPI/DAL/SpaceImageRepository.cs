@@ -59,7 +59,7 @@ namespace VenueAPI.DAL
 
                 return spaceImages.ToList();
             }
-        }
+        }              
 
         public async Task<bool> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid venueId, Guid spaceId)
         {
@@ -75,6 +75,19 @@ namespace VenueAPI.DAL
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
                 return true;
+            }
+        }
+
+        public async Task<List<SpaceImageDto>> GetSpaceImagesAsync(List<Guid> spaceIds, bool requestSpecificallyForSpaceImages = true)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                IEnumerable<SpaceImageDto> spaceImages = await con.QueryAsync<SpaceImageDto>("SELECT * FROM SpaceImage WHERE spaceId IN @spaceIds", new { spaceIds });
+
+                if (spaceImages == null || (requestSpecificallyForSpaceImages && spaceImages.Count() == 0))
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+
+                return spaceImages.ToList();
             }
         }
     }

@@ -48,18 +48,18 @@ namespace VenueAPI.DAL
             }
         }
 
-        public async Task<List<VenueImageDto>> GetVenueImagesAsync(Guid venueId)
+        public async Task<List<VenueImageDto>> GetVenueImagesAsync(Guid venueId, bool requestSpecificallyForVenueImages = true)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<VenueImageDto> venueImages = await con.QueryAsync<VenueImageDto>("SELECT * FROM VenueImage WHERE venueId = @venueId", new { venueId });
 
-                if (venueImages == null)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+                if (venueImages == null || (requestSpecificallyForVenueImages && venueImages.Count() == 0))
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
                 return venueImages.ToList();
             }
-        }
+        }        
 
         public async Task<bool> DeleteVenueImagesAsync(List<Guid> venueImageIds, Guid venueId)
         {
@@ -75,6 +75,19 @@ namespace VenueAPI.DAL
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
                 return true;
+            }
+        }
+
+        public async Task<List<VenueImageDto>> GetVenueImagesAsync(List<Guid> venueIds, bool requestSpecificallyForVenueImages = true)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                IEnumerable<VenueImageDto> venueImages = await con.QueryAsync<VenueImageDto>("SELECT * FROM VenueImage WHERE venueId IN @venueIds", new { venueIds });
+
+                if (venueImages == null || (requestSpecificallyForVenueImages && venueImages.Count() == 0))
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+
+                return venueImages.ToList();
             }
         }
     }
