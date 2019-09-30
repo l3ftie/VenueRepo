@@ -18,11 +18,13 @@ namespace VenueAPI.DAL
         private readonly string _connectionString;
         private readonly IVenueImageRepository _venueImageRepo;
         private readonly ISpaceRepository _spaceRepo;
-        public VenueRepository(IConfiguration config, IVenueImageRepository venueImageRepo, ISpaceRepository spaceRepo)
+        private readonly ISpaceImageRepository _spaceImageRepo;
+        public VenueRepository(IConfiguration config, IVenueImageRepository venueImageRepo, ISpaceRepository spaceRepo, ISpaceImageRepository spaceImageRepo)
         {
             _connectionString = config.GetConnectionString("LocalSqlServer");
             _venueImageRepo = venueImageRepo;
             _spaceRepo = spaceRepo;
+            _spaceImageRepo = spaceImageRepo;
         }
         
         public async Task<VenueDto> AddVenueAsync(Venue venue)
@@ -125,13 +127,24 @@ namespace VenueAPI.DAL
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                List<VenueImageDto> venueImageDtos = await _venueImageRepo.GetVenueImagesAsync(venueId);
-
                 //Delete images first or foreign key constraint fails at DB level
-                bool deleteImagesResult = await con.DeleteAsync(venueImageDtos);
+                List<VenueImageDto> venueImageDtos = await _venueImageRepo.GetVenueImagesAsync(venueId, false);
+                if (venueImageDtos.Count() > 0)
+                    await con.DeleteAsync(venueImageDtos);
+
+                List<SpaceDto> spaceDtos = await _spaceRepo.GetSpacesAsync(venueId, false);
+
+                foreach (SpaceDto space in spaceDtos)
+                {
+                    List<SpaceImageDto> spaceImageDtos = await _spaceImageRepo.GetSpaceImagesAsync(venueId, space.SpaceId);
+                    if (spaceImageDtos.Count() > 0)
+                        await con.DeleteAsync(spaceImageDtos);
+                }
+
+                if (spaceDtos.Count() > 0)
+                    await con.DeleteAsync(spaceDtos);
 
                 bool deleteVenueResult = await con.DeleteAsync(new VenueDto { VenueId = venueId });
-
                 if (!deleteVenueResult)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 

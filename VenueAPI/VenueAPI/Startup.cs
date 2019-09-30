@@ -45,8 +45,18 @@ namespace VenueAPI
 
             services.AddSwaggerGen(option =>
             {
-                option.SwaggerDoc("v2", new Info { Title = "Venue API", Version = "v1.0" });
                 option.IncludeXmlComments(xmlFilePath);
+
+                option.SwaggerDoc("v2", new Info
+                {
+                    Title = "Venue API",
+                    Version = "v1.0",
+                    Description = "There should be functional CRUD operations for Entities Venue and Space. CRD operations should function for VenueImage and SpaceImage Entities\n\n" +
+                    "Order of Operation:\n" +
+                    "1) Add a Venue\n" +
+                    "2) Add either Venue images or Spaces to the Venue\n" +
+                    "3) Once a Space has been added, add images to the Space\n\n"
+                });
             });
         }
 
