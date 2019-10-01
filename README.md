@@ -1,6 +1,6 @@
 # VenueRepo
 
-*VenueAPI is implemented at the moment
+*VenueAPI is implemented
 
 *AgentAPI and BookingAPI have skeleton setup code but only entity creation (Add) endpoints minimally implemented (not writing to db)
 
