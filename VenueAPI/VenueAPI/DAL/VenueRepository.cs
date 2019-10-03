@@ -95,23 +95,23 @@ namespace VenueAPI.DAL
                 if (venueDtos == null || venueDtos.Count() == 0)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                List<List<VenueDto>> venueDtosGroupedById = venueDtos.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
-
                 List<SpaceResponse> spaces = await _spaceRepo.GetSpacesAsync(venueDtos.Select(x => x.VenueId).Distinct().ToList(), false);
+
+                List<List<VenueDto>> venueDtosGroupedById = venueDtos.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
 
                 List<List<SpaceResponse>> spacesGroupedByVenueId = spaces.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
 
                 foreach (List<VenueDto> groupedVenues in venueDtosGroupedById)
                 {
-                    List<SpaceResponse> spaceResponses = new List<SpaceResponse>();                    
+                    List<SpaceResponse> spacesToBeMapped = new List<SpaceResponse>();                    
 
                     foreach (List<SpaceResponse> spaceGrouping in spacesGroupedByVenueId)
                     {
                         if (spaceGrouping.FirstOrDefault().VenueId == groupedVenues.FirstOrDefault().VenueId)
-                            spaceResponses = spaceGrouping;
+                            spacesToBeMapped = spaceGrouping;
                     }
 
-                    VenueResponse model = groupedVenues.MapDtoToResponse(spaceResponses);
+                    VenueResponse model = groupedVenues.MapDtoToResponse(spacesToBeMapped);
 
                     models.Add(model);
                 }               
