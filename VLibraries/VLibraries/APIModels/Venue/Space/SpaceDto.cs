@@ -1,22 +1,17 @@
 ﻿using Dapper.Contrib.Extensions;
 using System;
-using System.Collections.Generic;
 
 namespace VLibraries.APIModels
 {
     [Table("Space")]
-    public class SpaceDto : Space
+    public class SpaceDto : SpaceRequest
     {
         [Key]
         public Guid SpaceId { get; set; }
 
-        [ExplicitKey]
         public Guid VenueId { get; set; }
-
-        [Write(false)]
-        public List<SpaceImageDto> SpaceImages { get; set; }
-
-        [Write(false)]
-        public SpaceTypeDto SpaceType { get; set; }
+        public Guid SpaceImageId { get; set; }
+        public string SpaceTypeDescription{ get; set; }
+        public string Base64SpaceImageString { get; set; }
     }
 }

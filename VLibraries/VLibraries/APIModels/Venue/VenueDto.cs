@@ -5,15 +5,13 @@ using System.Collections.Generic;
 namespace VLibraries.APIModels
 {
     [Table("Venue")]
-    public class VenueDto : Venue
+    public class VenueDto : VenueRequest
     {
         [Key]
         public Guid VenueId { get; set; }
 
-        [Write(false)]
-        public List<SpaceDto> Spaces { get; set; }
-
-        [Write(false)]
-        public new List<VenueImageDto> VenueImages { get; set; }
+        public Guid VenueImageId { get; set; }
+        public string VenueTypeDescription { get; set; }
+        public string Base64VenueImageString { get; set; }
     }
 }

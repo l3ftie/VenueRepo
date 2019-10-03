@@ -78,6 +78,7 @@ namespace VenueAPI.DAL
             }
         }
 
+        //Only at Repo level
         public async Task<List<SpaceImageDto>> GetSpaceImagesAsync(List<Guid> spaceIds, bool requestSpecificallyForSpaceImages = true)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))

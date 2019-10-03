@@ -9,7 +9,6 @@ namespace VLibraries.APIModels
         [Key]
         public Guid VenueImageId { get; set; }
 
-        [ExplicitKey]
         public Guid VenueId { get; set; }
     }
 }

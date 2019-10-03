@@ -8,7 +8,7 @@ namespace VLibraries.APIModels
     {
         [Key]
         public Guid SpaceImageId { get; set; }
-        [ExplicitKey]
+
         public Guid SpaceId { get; set; }
     }
 }

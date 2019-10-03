@@ -78,6 +78,7 @@ namespace VenueAPI.DAL
             }
         }
 
+        //Only at Repo level
         public async Task<List<VenueImageDto>> GetVenueImagesAsync(List<Guid> venueIds, bool requestSpecificallyForVenueImages = true)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))

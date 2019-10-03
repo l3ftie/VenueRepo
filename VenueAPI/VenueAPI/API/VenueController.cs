@@ -33,11 +33,11 @@ namespace VenueAPI.API
         [HttpPost]
         [Route("")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> AddVenueAsync([FromBody] Venue venue)
+        public async Task<ActionResult<ResponseBase<VenueResponse>>> AddVenueAsync([FromBody] VenueRequest venue)
         {
-            VenueDto result = await _venueProvider.AddVenueAsync(venue);
+            VenueResponse result = await _venueProvider.AddVenueAsync(venue);
 
-            return new ResponseBase<VenueDto>(result);
+            return new ResponseBase<VenueResponse>(result);
         }
 
         /// <summary>
@@ -52,11 +52,11 @@ namespace VenueAPI.API
         [HttpGet]
         [Route("{venueId}")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> GetVenueAsync(Guid venueId)
+        public async Task<ActionResult<ResponseBase<VenueResponse>>> GetVenueAsync(Guid venueId)
         {
-            VenueDto result = await _venueProvider.GetVenueAsync(venueId);
+            VenueResponse result = await _venueProvider.GetVenueAsync(venueId);
 
-            return new ResponseBase<VenueDto>(result);
+            return new ResponseBase<VenueResponse>(result);
         }
 
         /// <summary>
@@ -91,11 +91,11 @@ namespace VenueAPI.API
         [HttpPatch]
         [Route("{venueId}")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<VenueDto>>> EditVenueAsync([FromBody] Venue venue, Guid venueId)
+        public async Task<ActionResult<ResponseBase<VenueResponse>>> EditVenueAsync([FromBody] VenueRequest venue, Guid venueId)
         {
-            VenueDto result = await _venueProvider.EditVenueAsync(venue, venueId);
+            VenueResponse result = await _venueProvider.EditVenueAsync(venue, venueId);
 
-            return new ResponseBase<VenueDto>(result);
+            return new ResponseBase<VenueResponse>(result);
         }
 
         /// <summary>

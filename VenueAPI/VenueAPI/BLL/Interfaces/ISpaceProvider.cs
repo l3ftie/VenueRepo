@@ -7,10 +7,11 @@ namespace VenueAPI.BLL
 {
     public interface ISpaceProvider
     {
-        Task<SpaceDto> AddSpaceAsync(Space venue, Guid venueId);
-        Task<SpaceDto> GetSpaceAsync(Guid venueId, Guid spaceId);
-        Task<List<SpaceDto>> GetSpacesAsync(Guid venueId);
-        Task<SpaceDto> EditSpaceAsync(Space space, Guid venueId, Guid spaceId);
+        Task<SpaceResponse> AddSpaceAsync(SpaceRequest venue, Guid venueId);
+        Task<SpaceResponse> GetSpaceAsync(Guid venueId, Guid spaceId);
+        Task<List<SpaceResponse>> GetSpacesAsync(Guid venueId);
+        Task<SpaceResponse> EditSpaceAsync(SpaceRequest space, Guid venueId, Guid spaceId);
         Task<bool> DeleteSpaceAsync(Guid venueId, Guid spaceId);
+        Task<SpaceResponse> UpsertSpaceType(Guid venueId, Guid spaceId, SpaceTypeDto spaceType);
     }
 }

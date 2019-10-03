@@ -9,10 +9,11 @@ namespace VLibraries.VenueAPI
 {
     public interface ISpaceService
     {
-        Task<ActionResult<ResponseBase<SpaceDto>>> AddSpaceAsync([FromBody] Space space, Guid venueId);
-        Task<ActionResult<ResponseBase<SpaceDto>>> GetSpaceAsync(Guid venueId, Guid spaceId);
-        Task<ActionResult<ResponseBase<List<SpaceDto>>>> GetSpacesAsync(Guid venueId);
-        Task<ActionResult<ResponseBase<SpaceDto>>> EditSpaceAsync([FromBody] Space space, Guid venueId, Guid spaceId);
+        Task<ActionResult<ResponseBase<SpaceResponse>>> AddSpaceAsync([FromBody] SpaceRequest space, Guid venueId);
+        Task<ActionResult<ResponseBase<SpaceResponse>>> GetSpaceAsync(Guid venueId, Guid spaceId);
+        Task<ActionResult<ResponseBase<List<SpaceResponse>>>> GetSpacesAsync(Guid venueId);
+        Task<ActionResult<ResponseBase<SpaceResponse>>> EditSpaceAsync([FromBody] SpaceRequest space, Guid venueId, Guid spaceId);
         Task<ActionResult<ResponseBase<bool>>> DeleteSpaceAsync(Guid venueId, Guid spaceId);
+        Task<ActionResult<ResponseBase<SpaceResponse>>> UpsertSpaceType(Guid venueId, Guid spaceId, SpaceTypeDto spaceType);
     }
 }

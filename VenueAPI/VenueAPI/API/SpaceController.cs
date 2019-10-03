@@ -35,11 +35,11 @@ namespace VenueAPI.API
         [HttpPost]
         [Route("")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<SpaceDto>>> AddSpaceAsync([FromBody] Space space, Guid venueId)
+        public async Task<ActionResult<ResponseBase<SpaceResponse>>> AddSpaceAsync([FromBody] SpaceRequest space, Guid venueId)
         {
-            SpaceDto result = await _spaceProvider.AddSpaceAsync(space, venueId);
+            SpaceResponse result = await _spaceProvider.AddSpaceAsync(space, venueId);
 
-            return new ResponseBase<SpaceDto>(result);
+            return new ResponseBase<SpaceResponse>(result);
         }
 
         /// <summary>
@@ -55,11 +55,11 @@ namespace VenueAPI.API
         [HttpGet]
         [Route("{spaceId}")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<SpaceDto>>> GetSpaceAsync(Guid venueId, Guid spaceId)
+        public async Task<ActionResult<ResponseBase<SpaceResponse>>> GetSpaceAsync(Guid venueId, Guid spaceId)
         {
-            SpaceDto result = await _spaceProvider.GetSpaceAsync(venueId, spaceId);
+            SpaceResponse result = await _spaceProvider.GetSpaceAsync(venueId, spaceId);
 
-            return new ResponseBase<SpaceDto>(result);
+            return new ResponseBase<SpaceResponse>(result);
         }
 
         /// <summary>
@@ -74,11 +74,11 @@ namespace VenueAPI.API
         [HttpGet]
         [Route("")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<List<SpaceDto>>>> GetSpacesAsync(Guid venueId)
+        public async Task<ActionResult<ResponseBase<List<SpaceResponse>>>> GetSpacesAsync(Guid venueId)
         {
-            List<SpaceDto> results = await _spaceProvider.GetSpacesAsync(venueId);
+            List<SpaceResponse> results = await _spaceProvider.GetSpacesAsync(venueId);
 
-            return new ResponseBase<List<SpaceDto>>(results);
+            return new ResponseBase<List<SpaceResponse>>(results);
         }
 
         /// <summary>
@@ -94,11 +94,11 @@ namespace VenueAPI.API
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpPatch]
         [Route("{spaceId}")]
-        public async Task<ActionResult<ResponseBase<SpaceDto>>> EditSpaceAsync([FromBody] Space space, Guid venueId, Guid spaceId)
+        public async Task<ActionResult<ResponseBase<SpaceResponse>>> EditSpaceAsync([FromBody] SpaceRequest space, Guid venueId, Guid spaceId)
         {
-            SpaceDto result = await _spaceProvider.EditSpaceAsync(space, venueId, spaceId);
+            SpaceResponse result = await _spaceProvider.EditSpaceAsync(space, venueId, spaceId);
 
-            return new ResponseBase<SpaceDto>(result);
+            return new ResponseBase<SpaceResponse>(result);
         }
 
         /// <summary>
@@ -118,6 +118,26 @@ namespace VenueAPI.API
             bool result = await _spaceProvider.DeleteSpaceAsync(venueId, spaceId);
 
             return new ResponseBase<bool>(result);
+        }
+
+        /// <summary>
+        /// Add to, or modify the existing Type of the space e.g. Change a Space from a Table to a Booth
+        /// </summary>
+        /// <param name="spaceId"></param>
+        /// <param name="spaceType"></param>
+        /// <param name="venueId"></param>
+        /// <returns></returns>
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [HttpDelete]
+        [Route("{spaceId}/SpaceTypes")]
+        public async Task<ActionResult<ResponseBase<SpaceResponse>>> UpsertSpaceType(Guid venueId, Guid spaceId, SpaceTypeDto spaceType)
+        {
+            SpaceResponse result = await _spaceProvider.UpsertSpaceType(venueId, spaceId, spaceType);
+
+            return new ResponseBase<SpaceResponse>(result);
         }
     }
 }

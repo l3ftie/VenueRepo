@@ -4,7 +4,7 @@
         <name>VenueAPI</name>
     </assembly>
     <members>
-        <member name="M:VenueAPI.API.SpaceController.AddSpaceAsync(VLibraries.APIModels.Space,System.Guid)">
+        <member name="M:VenueAPI.API.SpaceController.AddSpaceAsync(VLibraries.APIModels.SpaceRequest,System.Guid)">
             <summary>
             Add a Space to a Venue by the venueId
             </summary>
@@ -27,7 +27,7 @@
             <param name="venueId"></param>
             <returns></returns>
         </member>
-        <member name="M:VenueAPI.API.SpaceController.EditSpaceAsync(VLibraries.APIModels.Space,System.Guid,System.Guid)">
+        <member name="M:VenueAPI.API.SpaceController.EditSpaceAsync(VLibraries.APIModels.SpaceRequest,System.Guid,System.Guid)">
             <summary>
             Edit a Space within a Venue by using the spaceId and venudId
             </summary>
@@ -41,6 +41,15 @@
             Delete a Space within a Venue by using the spaceId and venudId
             </summary>
             <param name="spaceId"></param>
+            <param name="venueId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VenueAPI.API.SpaceController.UpsertSpaceType(System.Guid,System.Guid,VLibraries.APIModels.SpaceTypeDto)">
+            <summary>
+            Add to, or modify the existing Type of the space e.g. Change a Space from a Table to a Booth
+            </summary>
+            <param name="spaceId"></param>
+            <param name="spaceType"></param>
             <param name="venueId"></param>
             <returns></returns>
         </member>
@@ -70,7 +79,7 @@
             <param name="venueId"></param>
             <returns></returns>
         </member>
-        <member name="M:VenueAPI.API.VenueController.AddVenueAsync(VLibraries.APIModels.Venue)">
+        <member name="M:VenueAPI.API.VenueController.AddVenueAsync(VLibraries.APIModels.VenueRequest)">
             <summary>
             Add a Venue
             </summary>
@@ -90,7 +99,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:VenueAPI.API.VenueController.EditVenueAsync(VLibraries.APIModels.Venue,System.Guid)">
+        <member name="M:VenueAPI.API.VenueController.EditVenueAsync(VLibraries.APIModels.VenueRequest,System.Guid)">
             <summary>
             Edit a Venue by its Id
             </summary>
