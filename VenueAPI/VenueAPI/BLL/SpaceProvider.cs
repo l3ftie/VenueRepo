@@ -37,10 +37,5 @@ namespace VenueAPI.BLL
         {
             return await _spaceRepo.DeleteSpaceAsync(venueId, spaceId);
         }
-
-        public async Task<SpaceResponse> UpsertSpaceType(Guid venueId, Guid spaceId, SpaceTypeDto spaceType)
-        {
-            return await _spaceRepo.UpsertSpaceType(venueId, spaceId, spaceType);
-        }
     }
 }

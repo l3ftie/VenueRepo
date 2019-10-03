@@ -19,13 +19,11 @@ namespace VenueAPI.DAL
         private readonly string _connectionString;
         private readonly IVenueImageRepository _venueImageRepo;
         private readonly ISpaceRepository _spaceRepo;
-        private readonly ISpaceImageRepository _spaceImageRepo;
-        public VenueRepository(IConfiguration config, IVenueImageRepository venueImageRepo, ISpaceRepository spaceRepo, ISpaceImageRepository spaceImageRepo)
+        public VenueRepository(IConfiguration config, IVenueImageRepository venueImageRepo, ISpaceRepository spaceRepo)
         {
             _connectionString = config.GetConnectionString("LocalSqlServer");
             _venueImageRepo = venueImageRepo;
             _spaceRepo = spaceRepo;
-            _spaceImageRepo = spaceImageRepo;
         }
         
         public async Task<VenueResponse> AddVenueAsync(VenueRequest venue)
@@ -52,6 +50,8 @@ namespace VenueAPI.DAL
         
         public async Task<VenueResponse> GetVenueAsync(Guid venueId)
         {
+            VenueResponse model = new VenueResponse();
+
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<VenueDto> venueDtos = await con.QueryAsync<VenueDto>("SELECT V.VenueId, V.Title, V.Description, V.MUrl, V.Summary, " +
@@ -68,38 +68,45 @@ namespace VenueAPI.DAL
                 if (venueDtos == null || venueDtos.Count() == 0)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                VenueResponse model = venueDtos.MapDtoToResponse();
+                List<SpaceResponse> spaces = await _spaceRepo.GetSpacesAsync(venueId, false);
 
-                model.Spaces = await _spaceRepo.GetSpacesAsync(venueId, false);
+                model = venueDtos.MapDtoToResponse(spaces);
 
                 return model;
             }
         }        
 
-        public async Task<List<VenueDto>> GetVenuesAsync()
+        public async Task<List<VenueResponse>> GetVenuesAsync()
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                IEnumerable<VenueDto> venueDtos = await con.GetAllAsync<VenueDto>();
-               
+                IEnumerable<VenueDto> venueDtos = await con.QueryAsync<VenueDto>("SELECT V.VenueId, V.Title, V.Description, V.MUrl, V.Summary, " +
+                    "V.Testimonial, V.TestimonialContactEmail, V.TestimonialContactName, V.TestimonialContactOrganisation, " +
+                    "VI.VenueImageId, VI.Base64VenueImageString, " +
+                    "VT.VenueTypeId, VT.Description as VenueTypeDescription " +
+                    "FROM [VenueFinder].[dbo].Venue V " +
+                    "LEFT OUTER JOIN [VenueFinder].[dbo].VenueImage VI " +
+                    "ON VI.VenueId = V.VenueId " +
+                    "LEFT OUTER JOIN [VenueFinder].[dbo].VenueType VT " +
+                    "ON VT.VenueTypeId = V.VenueTypeId;");
+
                 if (venueDtos == null || venueDtos.Count() == 0)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                List<Guid> venueIds = venueDtos.Select(x => x.VenueId).Distinct().ToList();
+                List<List<VenueDto>> groupedVenuesbyId = venueDtos.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
 
-                //IEnumerable<VenueImageDto> venueImages = await _venueImageRepo.GetVenueImagesAsync(venueIds, false);
+                List<VenueResponse> models = new List<VenueResponse>();
 
-                IEnumerable<SpaceDto> spaces = await _spaceRepo.GetSpacesAsync(venueIds, false);
+                foreach (List<VenueDto> groupedVenues in groupedVenuesbyId)
+                {
+                    List<SpaceResponse> spaces = await _spaceRepo.GetSpacesAsync(groupedVenues.FirstOrDefault().VenueId, false);
 
-                //Map to Models
-                //foreach (VenueDto venue in venueDtos)
-                //{
-                //    venue.VenueImages = venueImages.Where(x => x?.VenueId == venue.VenueId).ToList();
+                    VenueResponse model = groupedVenues.MapDtoToResponse(spaces);
 
-                //    venue.Spaces = spaces.Where(x => x?.VenueId == venue.VenueId).ToList();
-                //}
+                    models.Add(model);
+                }               
 
-                return venueDtos.ToList();
+                return models;
             }
         }
 
@@ -137,9 +144,9 @@ namespace VenueAPI.DAL
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 //Delete in Order so as not to violate SQL table constraints
-                //List<SpaceDto> spaceDtos = await _spaceRepo.GetSpacesAsync(venueId, false);
+                List<SpaceResponse> spaces = await _spaceRepo.GetSpacesAsync(venueId, false);
 
-                //spaceDtos.ForEach(async space => await _spaceRepo.DeleteSpaceAsync(venueId, space.SpaceId));
+                spaces.ForEach(async space => await _spaceRepo.DeleteSpaceAsync(venueId, space.SpaceId));
                 
                 List<VenueImageDto> venueImageDtos = await _venueImageRepo.GetVenueImagesAsync(venueId, false);
                 if (venueImageDtos.Count() > 0)

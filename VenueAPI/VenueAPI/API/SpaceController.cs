@@ -119,25 +119,5 @@ namespace VenueAPI.API
 
             return new ResponseBase<bool>(result);
         }
-
-        /// <summary>
-        /// Add to, or modify the existing Type of the space e.g. Change a Space from a Table to a Booth
-        /// </summary>
-        /// <param name="spaceId"></param>
-        /// <param name="spaceType"></param>
-        /// <param name="venueId"></param>
-        /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [HttpDelete]
-        [Route("{spaceId}/SpaceTypes")]
-        public async Task<ActionResult<ResponseBase<SpaceResponse>>> UpsertSpaceType(Guid venueId, Guid spaceId, SpaceTypeDto spaceType)
-        {
-            SpaceResponse result = await _spaceProvider.UpsertSpaceType(venueId, spaceId, spaceType);
-
-            return new ResponseBase<SpaceResponse>(result);
-        }
     }
 }

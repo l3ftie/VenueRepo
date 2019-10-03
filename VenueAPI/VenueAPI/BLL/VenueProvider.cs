@@ -25,7 +25,7 @@ namespace VenueAPI.BLL
             return await _venueRepo.GetVenueAsync(venueId);
         }
 
-        public async Task<List<VenueDto>> GetVenuesAsync()
+        public async Task<List<VenueResponse>> GetVenuesAsync()
         {
             return await _venueRepo.GetVenuesAsync();
         }

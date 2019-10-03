@@ -62,7 +62,7 @@ namespace VenueAPI.DAL
                         "JOIN [VenueFinder].[dbo].SpaceType ST " +
                         "ON ST.SpaceTypeId = S.SpaceTypeId " +
                         "LEFT OUTER JOIN [VenueFinder].[dbo].SpaceImage SI ON SI.SpaceId = S.SpaceId " +
-                        "WHERE S.SpaceId = @spaceId;", new { spaceId });
+                        "WHERE S.SpaceId = @spaceId AND S.VenueId = @venueId;", new { spaceId, venueId });
 
                 if (spaceDtos == null || (requestSpecificallyForSpaces && spaceDtos.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
@@ -104,7 +104,8 @@ namespace VenueAPI.DAL
             {
                 SpaceId = spaceId,
                 VenueId = venueId,
-                MaxCapacity = space.MaxCapacity
+                MaxCapacity = space.MaxCapacity,
+                SpaceTypeId = space.SpaceTypeId
             };
 
             using (SqlConnection con = new SqlConnection(_connectionString))
@@ -114,9 +115,7 @@ namespace VenueAPI.DAL
                 if (!updateSpaceResult)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
-                SpaceResponse model = await GetSpaceAsync(venueId, spaceId);
-
-                return model;
+                return await GetSpaceAsync(venueId, spaceId);
             }
         }
 
@@ -137,24 +136,11 @@ namespace VenueAPI.DAL
             }
         }
 
-        public async Task<SpaceResponse> UpsertSpaceType(Guid venueId, Guid spaceId, SpaceTypeDto spaceType)
+        //Not exposed at API level
+        public async Task<List<SpaceResponse>> GetSpacesAsync(List<Guid> venueIds, bool requestSpecificallyForSpaces = true)
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                int updateSpaceTypeResult = await con.ExecuteAsync("UPDATE Space SET SpaceTypeId = @spaceTypeId WHERE SpaceId = @spaceId", new { spaceTypeId = spaceType.SpaceTypeId, spaceId });
+            List<SpaceResponse> models = new List<SpaceResponse>();
 
-                if (updateSpaceTypeResult == 0)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
-            }
-
-            SpaceResponse model = await GetSpaceAsync(venueId, spaceId, false);
-
-            return model;
-        }
-
-        //Only at Repo level
-        public async Task<List<SpaceDto>> GetSpacesAsync(List<Guid> venueIds, bool requestSpecificallyForSpaces = true)
-        {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>("SELECT * FROM Space WHERE venueId IN @venueIds", new { venueIds });
@@ -164,19 +150,17 @@ namespace VenueAPI.DAL
                 
                 List<List<SpaceDto>> groupedSpacesbyVenueId = spaces.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
 
-                foreach (List<SpaceDto> groupedSpace in groupedSpacesbyVenueId)
+                foreach (List<SpaceDto> spacesGroupedByVenueId in groupedSpacesbyVenueId)
                 {
                     List<List<SpaceDto>> groupedSpacesBySpaceId = spaces.GroupBy(x => x.SpaceId).Select(y => y.ToList()).ToList();
 
-                    List<SpaceResponse> models = new List<SpaceResponse>();
-
-                    foreach (List<SpaceDto> spacesGroupedById in groupedSpacesbyVenueId)
+                    foreach (List<SpaceDto> spacesGroupedBySpaceId in groupedSpacesBySpaceId)
                     {
-                        models.Add(spacesGroupedById.MapDtoToResponse());
+                        models.Add(spacesGroupedBySpaceId.MapDtoToResponse());
                     }
                 }                
 
-                return spaces.ToList();
+                return models.ToList();
             }
         }       
     }

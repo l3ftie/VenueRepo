@@ -12,6 +12,5 @@ namespace VenueAPI.BLL
         Task<List<SpaceResponse>> GetSpacesAsync(Guid venueId);
         Task<SpaceResponse> EditSpaceAsync(SpaceRequest space, Guid venueId, Guid spaceId);
         Task<bool> DeleteSpaceAsync(Guid venueId, Guid spaceId);
-        Task<SpaceResponse> UpsertSpaceType(Guid venueId, Guid spaceId, SpaceTypeDto spaceType);
     }
 }

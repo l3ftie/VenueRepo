@@ -45,12 +45,13 @@ namespace VenueAPI.MappingExtensions
             return model;
         }
 
-        public static VenueResponse MapDtoToResponse(this IEnumerable<VenueDto> venueDtos)
+        public static VenueResponse MapDtoToResponse(this IEnumerable<VenueDto> venueDtos, List<SpaceResponse> spaces)
         {
             VenueDto venueDto = venueDtos.FirstOrDefault();
 
             VenueResponse model = new VenueResponse
             {
+                VenueId = venueDto.VenueId,
                 Description = venueDto.Description,
                 MUrl = venueDto.MUrl,
                 Summary = venueDto.Summary,
@@ -59,6 +60,7 @@ namespace VenueAPI.MappingExtensions
                 TestimonialContactEmail = venueDto.TestimonialContactEmail,
                 TestimonialContactName = venueDto.TestimonialContactName,
                 TestimonialContactOrganisation = venueDto.TestimonialContactOrganisation,
+                Spaces = spaces,
                 VenueImages = new List<VenueImageDto>(),
                 VenueType = new VenueTypeDto
                 {

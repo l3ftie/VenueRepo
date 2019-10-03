@@ -70,11 +70,11 @@ namespace VenueAPI.API
         [HttpGet]
         [Route("")]
         [CustomModelStateValidation]
-        public async Task<ActionResult<ResponseBase<List<VenueDto>>>> GetVenuesAsync()
+        public async Task<ActionResult<ResponseBase<List<VenueResponse>>>> GetVenuesAsync()
         {
-            List<VenueDto> result = await _venueProvider.GetVenuesAsync();
+            List<VenueResponse> result = await _venueProvider.GetVenuesAsync();
 
-            return new ResponseBase<List<VenueDto>>(result);
+            return new ResponseBase<List<VenueResponse>>(result);
         }
 
         /// <summary>

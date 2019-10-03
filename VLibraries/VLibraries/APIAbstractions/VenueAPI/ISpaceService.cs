@@ -14,6 +14,5 @@ namespace VLibraries.VenueAPI
         Task<ActionResult<ResponseBase<List<SpaceResponse>>>> GetSpacesAsync(Guid venueId);
         Task<ActionResult<ResponseBase<SpaceResponse>>> EditSpaceAsync([FromBody] SpaceRequest space, Guid venueId, Guid spaceId);
         Task<ActionResult<ResponseBase<bool>>> DeleteSpaceAsync(Guid venueId, Guid spaceId);
-        Task<ActionResult<ResponseBase<SpaceResponse>>> UpsertSpaceType(Guid venueId, Guid spaceId, SpaceTypeDto spaceType);
     }
 }

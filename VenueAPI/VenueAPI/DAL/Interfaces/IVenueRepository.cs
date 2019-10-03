@@ -11,7 +11,7 @@ namespace VenueAPI.DAL
     {
         Task<VenueResponse> AddVenueAsync(VenueRequest venue);
         Task<VenueResponse> GetVenueAsync(Guid id);
-        Task<List<VenueDto>> GetVenuesAsync();
+        Task<List<VenueResponse>> GetVenuesAsync();
         Task<VenueResponse> EditVenueAsync(VenueRequest venue, Guid id);
         Task<bool> DeleteVenueAsync(Guid id);
     }

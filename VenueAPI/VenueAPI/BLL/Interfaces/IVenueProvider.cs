@@ -10,7 +10,7 @@ namespace VenueAPI.BLL
     {
         Task<VenueResponse> AddVenueAsync(VenueRequest venue);
         Task<VenueResponse> GetVenueAsync(Guid venueId);
-        Task<List<VenueDto>> GetVenuesAsync();
+        Task<List<VenueResponse>> GetVenuesAsync();
         Task<VenueResponse> EditVenueAsync(VenueRequest venue, Guid venueId);
         Task<bool> DeleteVenueAsync(Guid venueId);     
     }

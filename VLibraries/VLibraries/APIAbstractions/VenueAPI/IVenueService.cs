@@ -11,7 +11,7 @@ namespace VLibraries.VenueAPI
     {
         Task<ActionResult<ResponseBase<VenueResponse>>> AddVenueAsync([FromBody] VenueRequest venue);
         Task<ActionResult<ResponseBase<VenueResponse>>> GetVenueAsync(Guid venueId);
-        Task<ActionResult<ResponseBase<List<VenueDto>>>> GetVenuesAsync();
+        Task<ActionResult<ResponseBase<List<VenueResponse>>>> GetVenuesAsync();
         Task<ActionResult<ResponseBase<VenueResponse>>> EditVenueAsync([FromBody] VenueRequest venue, Guid venueId);
         Task<ActionResult<ResponseBase<bool>>> DeleteVenueAsync(Guid venueId);                
     }

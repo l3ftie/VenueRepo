@@ -44,15 +44,6 @@
             <param name="venueId"></param>
             <returns></returns>
         </member>
-        <member name="M:VenueAPI.API.SpaceController.UpsertSpaceType(System.Guid,System.Guid,VLibraries.APIModels.SpaceTypeDto)">
-            <summary>
-            Add to, or modify the existing Type of the space e.g. Change a Space from a Table to a Booth
-            </summary>
-            <param name="spaceId"></param>
-            <param name="spaceType"></param>
-            <param name="venueId"></param>
-            <returns></returns>
-        </member>
         <member name="M:VenueAPI.API.SpaceImageController.AddSpaceImagesAsync(System.Collections.Generic.List{System.String},System.Guid,System.Guid)">
             <summary>
             Add Base64 encoded Image strings to a Space within a Venue by the spaceId and venueId
