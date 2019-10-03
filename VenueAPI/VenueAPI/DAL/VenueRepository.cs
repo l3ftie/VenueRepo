@@ -78,6 +78,8 @@ namespace VenueAPI.DAL
 
         public async Task<List<VenueResponse>> GetVenuesAsync()
         {
+            List<VenueResponse> models = new List<VenueResponse>();
+
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<VenueDto> venueDtos = await con.QueryAsync<VenueDto>("SELECT V.VenueId, V.Title, V.Description, V.MUrl, V.Summary, " +
@@ -93,15 +95,23 @@ namespace VenueAPI.DAL
                 if (venueDtos == null || venueDtos.Count() == 0)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                List<List<VenueDto>> groupedVenuesbyId = venueDtos.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
+                List<List<VenueDto>> venueDtosGroupedById = venueDtos.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
 
-                List<VenueResponse> models = new List<VenueResponse>();
+                List<SpaceResponse> spaces = await _spaceRepo.GetSpacesAsync(venueDtos.Select(x => x.VenueId).Distinct().ToList(), false);
 
-                foreach (List<VenueDto> groupedVenues in groupedVenuesbyId)
+                List<List<SpaceResponse>> spacesGroupedByVenueId = spaces.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
+
+                foreach (List<VenueDto> groupedVenues in venueDtosGroupedById)
                 {
-                    List<SpaceResponse> spaces = await _spaceRepo.GetSpacesAsync(groupedVenues.FirstOrDefault().VenueId, false);
+                    List<SpaceResponse> spaceResponses = new List<SpaceResponse>();                    
 
-                    VenueResponse model = groupedVenues.MapDtoToResponse(spaces);
+                    foreach (List<SpaceResponse> spaceGrouping in spacesGroupedByVenueId)
+                    {
+                        if (spaceGrouping.FirstOrDefault().VenueId == groupedVenues.FirstOrDefault().VenueId)
+                            spaceResponses = spaceGrouping;
+                    }
+
+                    VenueResponse model = groupedVenues.MapDtoToResponse(spaceResponses);
 
                     models.Add(model);
                 }               
