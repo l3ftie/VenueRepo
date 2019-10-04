@@ -22,29 +22,16 @@ namespace VenueAPI.DAL
             _connectionString = config.GetConnectionString("LocalSqlServer");
         }
 
-        public async Task<List<VenueImageDto>> AddVenueImagesAsync(List<string> base64EncodedVenueImages, Guid venueId)
-        {
-            List<VenueImageDto> venueImageDtos = new List<VenueImageDto>();
-
-            foreach (string img in base64EncodedVenueImages)
-            {
-                venueImageDtos.Add(new VenueImageDto
-                {
-                    Base64VenueImageString = img,
-                    VenueId = venueId
-                });
-            }
-
+        public async Task<int> AddVenueImagesAsync(List<VenueImageDto> venueImageDtos)
+        {          
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 int resultCount = await con.InsertAsync(venueImageDtos);
 
                 if (resultCount == 0)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Venue Images:\n{JsonConvert.SerializeObject(venueImageDtos)}\ninto Venue: {venueId}");
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Venue Images:\n{JsonConvert.SerializeObject(venueImageDtos)}\n");
 
-                venueImageDtos = await GetVenueImagesAsync(venueId);
-
-                return venueImageDtos;
+                return resultCount;
             }
         }
 
@@ -61,12 +48,8 @@ namespace VenueAPI.DAL
             }
         }        
 
-        public async Task<bool> DeleteVenueImagesAsync(List<Guid> venueImageIds, Guid venueId)
-        {
-            List<VenueImageDto> venueImageDtos = new List<VenueImageDto>();
-
-            venueImageIds.ForEach(x => venueImageDtos.Add(new VenueImageDto { VenueId = venueId, VenueImageId = x }));
-
+        public async Task<bool> DeleteVenueImagesAsync(List<VenueImageDto> venueImageDtos)
+        {            
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 bool result = await con.DeleteAsync(venueImageDtos);
@@ -79,17 +62,17 @@ namespace VenueAPI.DAL
         }
 
         //Only at Repo level
-        public async Task<List<VenueImageDto>> GetVenueImagesAsync(List<Guid> venueIds, bool requestSpecificallyForVenueImages = true)
-        {
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                IEnumerable<VenueImageDto> venueImages = await con.QueryAsync<VenueImageDto>("SELECT * FROM VenueImage WHERE venueId IN @venueIds", new { venueIds });
+        //public async Task<List<VenueImageDto>> GetVenueImagesAsync(List<Guid> venueIds, bool requestSpecificallyForVenueImages = true)
+        //{
+        //    using (SqlConnection con = new SqlConnection(_connectionString))
+        //    {
+        //        IEnumerable<VenueImageDto> venueImages = await con.QueryAsync<VenueImageDto>("SELECT * FROM VenueImage WHERE venueId IN @venueIds", new { venueIds });
 
-                if (venueImages == null || (requestSpecificallyForVenueImages && venueImages.Count() == 0))
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+        //        if (venueImages == null || (requestSpecificallyForVenueImages && venueImages.Count() == 0))
+        //            throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                return venueImages.ToList();
-            }
-        }
+        //        return venueImages.ToList();
+        //    }
+        //}
     }
 }

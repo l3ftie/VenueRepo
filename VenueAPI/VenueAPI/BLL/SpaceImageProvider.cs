@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VenueAPI.DAL;
+using VenueAPI.Extensions;
 using VLibraries.APIModels;
 
 namespace VenueAPI.BLL
@@ -17,16 +18,7 @@ namespace VenueAPI.BLL
 
         public async Task<List<SpaceImageDto>> AddSpaceImagesAsync(List<string> base64EncodedVenueImages, Guid venueId, Guid spaceId)
         {
-            List<SpaceImageDto> spaceImageDtos = new List<SpaceImageDto>();
-
-            foreach (string img in base64EncodedVenueImages)
-            {
-                spaceImageDtos.Add(new SpaceImageDto
-                {
-                    Base64SpaceImageString = img,
-                    SpaceId = spaceId
-                });
-            }
+            List<SpaceImageDto> spaceImageDtos = base64EncodedVenueImages.MapSpaceImageStringsToDtos(spaceId);
 
             await _spaceImageRepo.AddSpaceImagesAsync(spaceImageDtos);
 
@@ -41,9 +33,7 @@ namespace VenueAPI.BLL
 
         public async Task<bool> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid venueId, Guid spaceId)
         {
-            List<SpaceImageDto> spaceImageDtos = new List<SpaceImageDto>();
-
-            spaceImageIds.ForEach(x => spaceImageDtos.Add(new SpaceImageDto { SpaceId = spaceId, SpaceImageId = x }));
+            List<SpaceImageDto> spaceImageDtos = spaceImageIds.MapSpaceIdDetailsToDtos(spaceId);
 
             return await _spaceImageRepo.DeleteSpaceImagesAsync(spaceImageDtos);
         }

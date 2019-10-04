@@ -4,10 +4,43 @@ using System.Linq;
 using System.Threading.Tasks;
 using VLibraries.APIModels;
 
-namespace VenueAPI.MappingExtensions
+namespace VenueAPI.Extensions
 {
     public static class DtoToResponseExtensions
     {
+        public static List<SpaceResponse> MapDtosToResponses(this List<SpaceDto> spaceDtos)
+        {
+            List<List<SpaceDto>> groupedSpaces = spaceDtos.GroupSpacesBySpaceId();
+
+            List<SpaceResponse> mappedSpaces = new List<SpaceResponse>();
+
+            foreach (List<SpaceDto> spacesGroupedById in groupedSpaces)
+            {
+                mappedSpaces.Add(spacesGroupedById.MapDtosToResponse());
+            }
+
+            return mappedSpaces.ToList();
+        }
+
+        public static List<SpaceResponse> MapDtoGroupedByVenueIdToResponses(this List<SpaceDto> spaceDtos)
+        {
+            List<List<SpaceDto>> groupedSpaces = spaceDtos.GroupSpacesByVenueId();
+
+            List<SpaceResponse> mappedSpaces = new List<SpaceResponse>();
+
+            foreach (List<SpaceDto> spaceGrouping in groupedSpaces)
+            {
+                List<List<SpaceDto>> groupedSpacesBySpaceId = spaceDtos.ToList().GroupSpacesBySpaceId();
+
+                foreach (List<SpaceDto> spacesGroupedBySpaceId in groupedSpacesBySpaceId)
+                {
+                    mappedSpaces.Add(spacesGroupedBySpaceId.MapDtosToResponse());
+                }
+            }
+
+            return mappedSpaces;
+        }
+
         public static SpaceResponse MapDtosToResponse(this IEnumerable<SpaceDto> spaceDtos)
         {
             SpaceDto spaceDto = spaceDtos.FirstOrDefault();

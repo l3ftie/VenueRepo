@@ -12,6 +12,6 @@ namespace VenueAPI.DAL
         Task<bool> DeleteSpaceImagesAsync(List<SpaceImageDto> spaceImageDtos);
 
         //Not exposed at API Level
-        Task<List<SpaceImageDto>> GetSpaceImagesAsync(List<Guid> spaceIds, bool requestSpecificallyForSpaceImages = true); 
+        //Task<List<SpaceImageDto>> GetSpaceImagesAsync(List<Guid> spaceIds, bool requestSpecificallyForSpaceImages = true); 
     }
 }

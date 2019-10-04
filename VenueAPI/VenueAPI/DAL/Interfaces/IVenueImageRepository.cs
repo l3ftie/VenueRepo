@@ -7,11 +7,11 @@ namespace VenueAPI.DAL
 {
     public interface IVenueImageRepository
     {
-        Task<List<VenueImageDto>> AddVenueImagesAsync(List<string> base64EncodedVenueImages, Guid venueId);
+        Task<int> AddVenueImagesAsync(List<VenueImageDto> venueImageDtos);
         Task<List<VenueImageDto>> GetVenueImagesAsync(Guid venueId, bool requestSpecificallyForVenueImages = true);
-        Task<bool> DeleteVenueImagesAsync(List<Guid> venueImageIds, Guid venueId);
+        Task<bool> DeleteVenueImagesAsync(List<VenueImageDto> venueImageDtos);
 
         //Not exposed at API Level
-        Task<List<VenueImageDto>> GetVenueImagesAsync(List<Guid> venueId, bool requestSpecificallyForVenueImages = true); //Not exposed at API Level
+        //Task<List<VenueImageDto>> GetVenueImagesAsync(List<Guid> venueId, bool requestSpecificallyForVenueImages = true); //Not exposed at API Level
     }
 }

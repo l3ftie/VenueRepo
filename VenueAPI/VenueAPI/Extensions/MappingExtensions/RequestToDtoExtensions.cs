@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VLibraries.APIModels;
 
-namespace VenueAPI.MappingExtensions
+namespace VenueAPI.Extensions
 {
     public static class RequestToDtoExtensions
     {
@@ -22,6 +22,17 @@ namespace VenueAPI.MappingExtensions
                 TestimonialContactName = venue.TestimonialContactName,
                 TestimonialContactOrganisation = venue.TestimonialContactOrganisation,
                 VenueTypeId = venue.VenueTypeId
+            };
+        }
+
+        public static SpaceDto MapRequestToDto(this SpaceRequest space, Guid venueId, Guid spaceId)
+        {
+            return new SpaceDto
+            {
+                MaxCapacity = space.MaxCapacity,
+                SpaceTypeId = space.SpaceTypeId,
+                VenueId = venueId,
+                SpaceId = spaceId
             };
         }
     }

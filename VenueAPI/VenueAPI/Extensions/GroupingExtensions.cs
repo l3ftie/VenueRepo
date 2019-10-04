@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using VLibraries.APIModels;
 
-namespace VenueAPI.MappingExtensions
+namespace VenueAPI.Extensions
 {
-    public static class LinqExtensions
+    public static class GroupingExtensions
     {
         public static List<List<SpaceResponse>> GroupSpacesByVenueId(this List<SpaceResponse> spaces)
         {
@@ -20,8 +20,13 @@ namespace VenueAPI.MappingExtensions
 
         public static List<List<SpaceDto>> GroupSpacesBySpaceId(this List<SpaceDto> spaces)
         {
-            return spaces.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
+            return spaces.GroupBy(x => x.SpaceId).Select(y => y.ToList()).ToList();
         }
+
+        //public static List<List<SpaceDto>> GroupSpacesBySpaceId(this List<SpaceDto> spaces)
+        //{
+        //    return spaces.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
+        //}
 
         public static List<List<VenueDto>> GroupVenuesByVenueId(this List<VenueDto> venueDtos)
         {

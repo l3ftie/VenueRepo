@@ -2,7 +2,7 @@
 using System.Linq;
 using VLibraries.APIModels;
 
-namespace VenueAPI.MappingExtensions
+namespace VenueAPI.Extensions
 {
     public static class VenueMappingExtensions
     {
@@ -14,18 +14,19 @@ namespace VenueAPI.MappingExtensions
 
             List<List<SpaceResponse>> spaceGrouping = unmappedSpaces.GroupSpacesByVenueId();
 
-            foreach (List<VenueDto> venue in venueGrouping)
+            foreach (List<VenueDto> groupedVenues in venueGrouping)
             {
-                VenueResponse mappedVenue = venue.MapSpaceGroupingToVenue(spaceGrouping);
+                List<SpaceResponse> matchingSpaces = groupedVenues.GetMatchingSpaceGroupings(spaceGrouping);
 
-                if (mappedVenue != null)
-                    mappedVenues.Add(mappedVenue);
+                VenueResponse mappedVenue = groupedVenues.MapDtoToResponse(matchingSpaces);
+
+                mappedVenues.Add(mappedVenue);
             }
 
             return mappedVenues;
         }
 
-        public static VenueResponse MapSpaceGroupingToVenue(this List<VenueDto> groupedVenues, List<List<SpaceResponse>> spacesGroupedByVenueId)
+        public static List<SpaceResponse> GetMatchingSpaceGroupings(this List<VenueDto> groupedVenues, List<List<SpaceResponse>> spacesGroupedByVenueId)
         {
             List<SpaceResponse> spacesToBeMapped = new List<SpaceResponse>();
 
@@ -33,14 +34,11 @@ namespace VenueAPI.MappingExtensions
             {
                 if (spaceGrouping.FirstOrDefault().VenueId == groupedVenues.FirstOrDefault().VenueId)
                 {
-                    //spacesToBeMapped = spaceGrouping;
-                    VenueResponse venue = groupedVenues.MapDtoToResponse(spacesToBeMapped);
-
-                    return venue;
+                    return spaceGrouping;
                 }
             }
 
-            return null;
+            return new List<SpaceResponse>();
         }        
     }
 }

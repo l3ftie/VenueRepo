@@ -7,10 +7,10 @@ namespace VenueAPI.DAL
 {
     public interface ISpaceRepository
     {
-        Task<Guid> AddSpaceAsync(SpaceRequest space, Guid venueId);
+        Task<Guid> AddSpaceAsync(SpaceDto spaceDto);
         Task<List<SpaceDto>> GetSpaceAsync(Guid venueId, Guid spaceId, bool requestSpecificallyForSpaces = true);
         Task<List<SpaceDto>> GetSpacesAsync(Guid venueId, bool requestSpecificallyForSpaces = true);
-        Task<bool> EditSpaceAsync(SpaceRequest venue, Guid venueId, Guid spaceId);
+        Task<bool> EditSpaceAsync(SpaceDto spaceDto);
         Task<bool> DeleteSpaceAsync(Guid venueId, Guid spaceId);
 
         //Not exposed at API Level

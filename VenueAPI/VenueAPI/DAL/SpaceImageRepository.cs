@@ -42,7 +42,7 @@ namespace VenueAPI.DAL
                 IEnumerable<SpaceImageDto> spaceImages = await con.QueryAsync<SpaceImageDto>("SELECT * FROM SpaceImage WHERE spaceId = @spaceId", new { spaceId });
 
                 if (spaceImages == null || (requestSpecificallyForSpaceImages && spaceImages.Count() == 0))
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound, $"No Space Images for VenueId: {venueId} and SpaceId: {spaceId} could be found");
 
                 return spaceImages.ToList();
             }
@@ -61,23 +61,18 @@ namespace VenueAPI.DAL
             }
         }
 
-       /// <summary>
-       /// Only exposed at Repository level
-       /// </summary>
-       /// <param name="spaceIds"></param>
-       /// <param name="requestSpecificallyForSpaceImages"></param>
-       /// <returns></returns>
-        public async Task<List<SpaceImageDto>> GetSpaceImagesAsync(List<Guid> spaceIds, bool requestSpecificallyForSpaceImages = true)
-        {
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                IEnumerable<SpaceImageDto> spaceImages = await con.QueryAsync<SpaceImageDto>("SELECT * FROM SpaceImage WHERE spaceId IN @spaceIds", new { spaceIds });
+       
+        //public async Task<List<SpaceImageDto>> GetSpaceImagesAsync(List<Guid> spaceIds, bool requestSpecificallyForSpaceImages = true)
+        //{
+        //    using (SqlConnection con = new SqlConnection(_connectionString))
+        //    {
+        //        IEnumerable<SpaceImageDto> spaceImages = await con.QueryAsync<SpaceImageDto>("SELECT * FROM SpaceImage WHERE spaceId IN @spaceIds", new { spaceIds });
 
-                if (spaceImages == null || (requestSpecificallyForSpaceImages && spaceImages.Count() == 0))
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
+        //        if (spaceImages == null || (requestSpecificallyForSpaceImages && spaceImages.Count() == 0))
+        //            throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                return spaceImages.ToList();
-            }
-        }
+        //        return spaceImages.ToList();
+        //    }
+        //}
     }
 }

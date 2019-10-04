@@ -8,7 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using VenueAPI.MappingExtensions;
+using VenueAPI.Extensions;
 using VLibraries.APIModels;
 using VLibraries.CustomExceptions;
 
@@ -26,7 +26,7 @@ namespace VenueAPI.DAL
         }
 
 
-        public async Task<Guid> AddSpaceAsync(SpaceRequest space, Guid venueId)
+        public async Task<Guid> AddSpaceAsync(SpaceDto spaceDto)
         {
             string insertSpaceSql =
             "DECLARE @TempTable table([SpaceId] [uniqueidentifier]); " +
@@ -37,15 +37,10 @@ namespace VenueAPI.DAL
 
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                Guid insertedSpaceId = await con.QueryFirstOrDefaultAsync<Guid>(insertSpaceSql, new
-                {
-                    VenueId = venueId,
-                    space.MaxCapacity,
-                    space.SpaceTypeId
-                });
+                Guid insertedSpaceId = await con.QueryFirstOrDefaultAsync<Guid>(insertSpaceSql, spaceDto);
 
                 if (insertedSpaceId == Guid.Empty)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Space:\n{JsonConvert.SerializeObject(space)}\ninto Venue: {venueId}");
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Space:\n{JsonConvert.SerializeObject(spaceDto)}\n");
 
                 return insertedSpaceId;
             }
@@ -90,19 +85,11 @@ namespace VenueAPI.DAL
             }
         }
         
-        public async Task<bool> EditSpaceAsync(SpaceRequest space, Guid venueId, Guid spaceId)
+        public async Task<bool> EditSpaceAsync(SpaceDto spaceDto)
         {
-            SpaceDto dto = new SpaceDto
-            {
-                SpaceId = spaceId,
-                VenueId = venueId,
-                MaxCapacity = space.MaxCapacity,
-                SpaceTypeId = space.SpaceTypeId
-            };
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                bool updateSpaceResult = await con.UpdateAsync(dto);
+                bool updateSpaceResult = await con.UpdateAsync(spaceDto);
 
                 if (!updateSpaceResult)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);

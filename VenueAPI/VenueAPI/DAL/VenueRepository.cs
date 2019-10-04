@@ -8,7 +8,7 @@ using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using VenueAPI.MappingExtensions;
+using VenueAPI.Extensions;
 using VLibraries.APIModels;
 using VLibraries.CustomExceptions;
 
