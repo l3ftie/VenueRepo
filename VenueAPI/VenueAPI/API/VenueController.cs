@@ -26,7 +26,7 @@ namespace VenueAPI.API
         /// </summary>
         /// <param name="venue"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<VenueResponse>))]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -45,7 +45,7 @@ namespace VenueAPI.API
         /// </summary>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<VenueResponse>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -63,7 +63,7 @@ namespace VenueAPI.API
         /// Get all Venues
         /// </summary>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<List<VenueResponse>>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -83,7 +83,7 @@ namespace VenueAPI.API
         /// <param name="venue"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<VenueResponse>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -103,13 +103,13 @@ namespace VenueAPI.API
         /// </summary>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<bool>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [HttpDelete]
-        [Route("")]
+        [Route("{venueId}")]
         [CustomModelStateValidation]
         public async Task<ActionResult<ResponseBase<bool>>> DeleteVenueAsync(Guid venueId)
         {

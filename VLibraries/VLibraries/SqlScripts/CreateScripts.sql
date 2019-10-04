@@ -54,8 +54,6 @@ left outer join [VenueFinder].[dbo].VenueImage VI
 on VI.VenueId = V.VenueId
 left outer join [VenueFinder].[dbo].VenueType VT 
 on VT.VenueTypeId = V.VenueTypeId 
-left outer join [VenueFinder].[dbo].[Space] S 
-on S.VenueId = V.VenueId 
 WHERE V.VenueId = '60C99C26-315F-491C-9971-3AEB0776A36B';
 
 

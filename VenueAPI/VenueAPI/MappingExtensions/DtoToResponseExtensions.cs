@@ -6,9 +6,9 @@ using VLibraries.APIModels;
 
 namespace VenueAPI.MappingExtensions
 {
-    public static class DtoToModelExtensions
+    public static class DtoToResponseExtensions
     {
-        public static SpaceResponse MapDtoToResponse(this IEnumerable<SpaceDto> spaceDtos)
+        public static SpaceResponse MapDtosToResponse(this IEnumerable<SpaceDto> spaceDtos)
         {
             SpaceDto spaceDto = spaceDtos.FirstOrDefault();
 
@@ -45,7 +45,7 @@ namespace VenueAPI.MappingExtensions
             return model;
         }
 
-        public static VenueResponse MapDtoToResponse(this IEnumerable<VenueDto> venueDtos, List<SpaceResponse> spaces)
+        public static VenueResponse MapDtoToResponse(this IEnumerable<VenueDto> venueDtos, List<SpaceResponse> spacesToAddToVenue)
         {
             VenueDto venueDto = venueDtos.FirstOrDefault();
 
@@ -60,7 +60,7 @@ namespace VenueAPI.MappingExtensions
                 TestimonialContactEmail = venueDto.TestimonialContactEmail,
                 TestimonialContactName = venueDto.TestimonialContactName,
                 TestimonialContactOrganisation = venueDto.TestimonialContactOrganisation,
-                Spaces = spaces,
+                Spaces = spacesToAddToVenue,
                 VenueImages = new List<VenueImageDto>(),
                 VenueType = new VenueTypeDto
                 {
@@ -71,7 +71,7 @@ namespace VenueAPI.MappingExtensions
 
             foreach (VenueDto venue in venueDtos)
             {
-                if (venue.VenueImageId != Guid.Empty)
+                if (venue.VenueImageId != Guid.Empty && !model.VenueImages.Any(x => x.VenueImageId == venue.VenueImageId))
                     model.VenueImages.Add(new VenueImageDto
                     {
                         Base64VenueImageString = venue.Base64VenueImageString,

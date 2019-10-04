@@ -28,7 +28,7 @@ namespace VenueAPI.API
         /// <param name="venueId"></param>
         /// <param name="spaceId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<List<SpaceImageDto>>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -49,7 +49,7 @@ namespace VenueAPI.API
         /// <param name="venueId"></param> 
         /// <param name="spaceId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<List<SpaceImageDto>>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -70,7 +70,7 @@ namespace VenueAPI.API
         /// <param name="spaceId"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<bool>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

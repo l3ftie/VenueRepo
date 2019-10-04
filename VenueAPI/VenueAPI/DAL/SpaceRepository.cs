@@ -26,7 +26,7 @@ namespace VenueAPI.DAL
         }
 
 
-        public async Task<SpaceResponse> AddSpaceAsync(SpaceRequest space, Guid venueId)
+        public async Task<Guid> AddSpaceAsync(SpaceRequest space, Guid venueId)
         {
             string insertSpaceSql =
             "DECLARE @TempTable table([SpaceId] [uniqueidentifier]); " +
@@ -47,11 +47,11 @@ namespace VenueAPI.DAL
                 if (insertedSpaceId == Guid.Empty)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Space:\n{JsonConvert.SerializeObject(space)}\ninto Venue: {venueId}");
 
-                return await GetSpaceAsync(venueId, insertedSpaceId, false);
+                return insertedSpaceId;
             }
         }
 
-        public async Task<SpaceResponse> GetSpaceAsync(Guid venueId, Guid spaceId, bool requestSpecificallyForSpaces = true)
+        public async Task<List<SpaceDto>> GetSpaceAsync(Guid venueId, Guid spaceId, bool requestSpecificallyForSpaces = true)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
@@ -67,17 +67,15 @@ namespace VenueAPI.DAL
                 if (spaceDtos == null || (requestSpecificallyForSpaces && spaceDtos.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                SpaceResponse model = spaceDtos.MapDtoToResponse();
-
-                return model;
+                return spaceDtos.ToList();
             }
         }
 
-        public async Task<List<SpaceResponse>> GetSpacesAsync(Guid venueId, bool requestSpecificallyForSpaces = true)
+        public async Task<List<SpaceDto>> GetSpacesAsync(Guid venueId, bool requestSpecificallyForSpaces = true)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>("SELECT S.SpaceId, S.VenueId, S.MaxCapacity, " +
+                IEnumerable<SpaceDto> spaceDtos = await con.QueryAsync<SpaceDto>("SELECT S.SpaceId, S.VenueId, S.MaxCapacity, " +
                         "ST.SpaceTypeId, ST.Description AS SpaceTypeDescription, " +
                         "SI.SpaceImageId, SI.Base64SpaceImageString " +
                         "FROM [VenueFinder].[dbo].[Space] S " +
@@ -85,20 +83,14 @@ namespace VenueAPI.DAL
                         "LEFT OUTER JOIN [VenueFinder].[dbo].SpaceImage SI ON SI.SpaceId = S.SpaceId " +
                         "WHERE S.VenueId = @venueId;", new { venueId });
 
-                List<List<SpaceDto>> groupedSpaces = spaces.GroupBy(x => x.SpaceId).Select(y => y.ToList()).ToList();
+                if (spaceDtos == null || (requestSpecificallyForSpaces && spaceDtos.Count() == 0))
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
 
-                List<SpaceResponse> models = new List<SpaceResponse>();
-
-                foreach (List<SpaceDto> spacesGroupedById in groupedSpaces)
-                {
-                    models.Add(spacesGroupedById.MapDtoToResponse());
-                }
-
-                return models.ToList();
+                return spaceDtos.ToList();               
             }
         }
         
-        public async Task<SpaceResponse> EditSpaceAsync(SpaceRequest space, Guid venueId, Guid spaceId)
+        public async Task<bool> EditSpaceAsync(SpaceRequest space, Guid venueId, Guid spaceId)
         {
             SpaceDto dto = new SpaceDto
             {
@@ -115,18 +107,20 @@ namespace VenueAPI.DAL
                 if (!updateSpaceResult)
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified);
 
-                return await GetSpaceAsync(venueId, spaceId);
+                return updateSpaceResult;                
             }
         }
 
+        /// <summary>
+        /// Delete in order so as not to violate Table FK constraints
+        /// </summary>
+        /// <param name="venueId"></param>
+        /// <param name="spaceId"></param>
+        /// <returns></returns>
         public async Task<bool> DeleteSpaceAsync(Guid venueId, Guid spaceId)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                List<SpaceImageDto> spaceImageDtos = await _spaceImagesRepo.GetSpaceImagesAsync(venueId, spaceId);
-
-                bool result1 = await con.DeleteAsync(spaceImageDtos);
-
+            {                
                 bool result = await con.DeleteAsync(new SpaceDto { SpaceId = spaceId, VenueId = venueId });
 
                 if (!result)
@@ -136,31 +130,22 @@ namespace VenueAPI.DAL
             }
         }
 
-        //Not exposed at API level
-        public async Task<List<SpaceResponse>> GetSpacesAsync(List<Guid> venueIds, bool requestSpecificallyForSpaces = true)
+        /// <summary>
+        /// This method is not exposed at API level
+        /// </summary>
+        /// <param name="venueIds"></param>
+        /// <param name="requestSpecificallyForSpaces"></param>
+        /// <returns></returns>
+        public async Task<List<SpaceDto>> GetSpacesAsync(List<Guid> venueIds, bool requestSpecificallyForSpaces = true)
         {
-            List<SpaceResponse> models = new List<SpaceResponse>();
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                IEnumerable<SpaceDto> spaces = await con.QueryAsync<SpaceDto>("SELECT * FROM Space WHERE venueId IN @venueIds", new { venueIds });
+                IEnumerable<SpaceDto> spaceDtos = await con.QueryAsync<SpaceDto>("SELECT * FROM Space WHERE venueId IN @venueIds", new { venueIds });
 
-                if (spaces == null || (requestSpecificallyForSpaces && spaces.Count() == 0))
+                if (spaceDtos == null || (requestSpecificallyForSpaces && spaceDtos.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
-                
-                List<List<SpaceDto>> groupedSpacesbyVenueId = spaces.GroupBy(x => x.VenueId).Select(y => y.ToList()).ToList();
 
-                foreach (List<SpaceDto> spacesGroupedByVenueId in groupedSpacesbyVenueId)
-                {
-                    List<List<SpaceDto>> groupedSpacesBySpaceId = spaces.GroupBy(x => x.SpaceId).Select(y => y.ToList()).ToList();
-
-                    foreach (List<SpaceDto> spacesGroupedBySpaceId in groupedSpacesBySpaceId)
-                    {
-                        models.Add(spacesGroupedBySpaceId.MapDtoToResponse());
-                    }
-                }                
-
-                return models.ToList();
+                return spaceDtos.ToList();
             }
         }       
     }

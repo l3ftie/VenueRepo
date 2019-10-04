@@ -27,7 +27,7 @@ namespace VenueAPI.API
         /// <param name="space"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<SpaceResponse>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NotModified)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -48,7 +48,7 @@ namespace VenueAPI.API
         /// /// <param name="spaceId"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<SpaceResponse>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -67,7 +67,7 @@ namespace VenueAPI.API
         /// </summary>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<List<SpaceResponse>>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -88,7 +88,7 @@ namespace VenueAPI.API
         /// <param name="spaceId"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<SpaceResponse>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -107,7 +107,7 @@ namespace VenueAPI.API
         /// <param name="spaceId"></param>
         /// <param name="venueId"></param>
         /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ResponseBase<bool>))]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

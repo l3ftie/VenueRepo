@@ -22,29 +22,16 @@ namespace VenueAPI.DAL
             _connectionString = config.GetConnectionString("LocalSqlServer");
         }
 
-        public async Task<List<SpaceImageDto>> AddSpaceImagesAsync(List<string> base64EncodedVenueImages, Guid venueId, Guid spaceId)
+        public async Task<int> AddSpaceImagesAsync(List<SpaceImageDto> spaceImageDtos)
         {
-            List<SpaceImageDto> spaceImageDtos = new List<SpaceImageDto>();
-
-            foreach (string img in base64EncodedVenueImages)
-            {
-                spaceImageDtos.Add(new SpaceImageDto
-                {
-                    Base64SpaceImageString = img,
-                    SpaceId = spaceId
-                });
-            }
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 int resultCount = await con.InsertAsync(spaceImageDtos);
 
                 if (resultCount == 0)
-                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Space Images:\n{JsonConvert.SerializeObject(spaceImageDtos)}\ninto Space: {spaceId}");
+                    throw new HttpStatusCodeResponseException(HttpStatusCode.NotModified, $"Error inserting Space Images:\n{JsonConvert.SerializeObject(spaceImageDtos)}\n");
 
-                spaceImageDtos = await GetSpaceImagesAsync(venueId, spaceId);
-
-                return spaceImageDtos;
+                return resultCount;
             }
         }
 
@@ -61,12 +48,8 @@ namespace VenueAPI.DAL
             }
         }              
 
-        public async Task<bool> DeleteSpaceImagesAsync(List<Guid> spaceImageIds, Guid venueId, Guid spaceId)
+        public async Task<bool> DeleteSpaceImagesAsync(List<SpaceImageDto> spaceImageDtos)
         {
-            List<SpaceImageDto> spaceImageDtos = new List<SpaceImageDto>();
-
-            spaceImageIds.ForEach(x => spaceImageDtos.Add(new SpaceImageDto { SpaceId = spaceId, SpaceImageId = x }));
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 bool result = await con.DeleteAsync(spaceImageDtos);
@@ -78,7 +61,12 @@ namespace VenueAPI.DAL
             }
         }
 
-        //Only at Repo level
+       /// <summary>
+       /// Only exposed at Repository level
+       /// </summary>
+       /// <param name="spaceIds"></param>
+       /// <param name="requestSpecificallyForSpaceImages"></param>
+       /// <returns></returns>
         public async Task<List<SpaceImageDto>> GetSpaceImagesAsync(List<Guid> spaceIds, bool requestSpecificallyForSpaceImages = true)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
