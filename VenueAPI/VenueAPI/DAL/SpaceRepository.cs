@@ -57,7 +57,9 @@ namespace VenueAPI.DAL
                         "JOIN [VenueFinder].[dbo].SpaceType ST " +
                         "ON ST.SpaceTypeId = S.SpaceTypeId " +
                         "LEFT OUTER JOIN [VenueFinder].[dbo].SpaceImage SI ON SI.SpaceId = S.SpaceId " +
-                        "WHERE S.SpaceId = @spaceId AND S.VenueId = @venueId;", new { spaceId, venueId });
+                        "WHERE S.SpaceId = @spaceId " +
+                        "AND S.VenueId = @venueId;", 
+                        new { spaceId, venueId });
 
                 if (spaceDtos == null || (requestSpecificallyForSpaces && spaceDtos.Count() == 0))
                     throw new HttpStatusCodeResponseException(HttpStatusCode.NotFound);
@@ -98,12 +100,6 @@ namespace VenueAPI.DAL
             }
         }
 
-        /// <summary>
-        /// Delete in order so as not to violate Table FK constraints
-        /// </summary>
-        /// <param name="venueId"></param>
-        /// <param name="spaceId"></param>
-        /// <returns></returns>
         public async Task<bool> DeleteSpaceAsync(Guid venueId, Guid spaceId)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
