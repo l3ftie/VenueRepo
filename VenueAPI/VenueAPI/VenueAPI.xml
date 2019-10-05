@@ -137,14 +137,6 @@
             <param name="requestSpecificallyForSpaces"></param>
             <returns></returns>
         </member>
-        <member name="M:VenueAPI.DAL.SpaceRepository.DeleteSpaceAsync(System.Guid,System.Guid)">
-            <summary>
-            Delete in order so as not to violate Table FK constraints
-            </summary>
-            <param name="venueId"></param>
-            <param name="spaceId"></param>
-            <returns></returns>
-        </member>
         <member name="M:VenueAPI.DAL.SpaceRepository.GetSpacesAsync(System.Collections.Generic.List{System.Guid},System.Boolean)">
             <summary>
             This method is not exposed at API level

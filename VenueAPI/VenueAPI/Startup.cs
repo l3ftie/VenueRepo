@@ -10,9 +10,13 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using VenueAPI.BLL;
 using VenueAPI.DAL;
+using VenueAPI.Services;
+using VenueAPI.Services.LocationIq;
+using VLibraries.APIAbstractions;
 using VLibraries.CommonMiddleware;
 using VLibraries.ExceptionHadler;
 using VLibraries.ExceptionHandler;
+using VLibraries.HttpClientWrapper;
 
 namespace VenueAPI
 {
@@ -29,6 +33,7 @@ namespace VenueAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IExceptionHandler, ExceptionHandler>()
+                .AddSingleton<IHttpClientWrapper, HttpClientWrapper>()
                 .AddSingleton<IVenueProvider, VenueProvider>()
                 .AddSingleton<IVenueRepository, VenueRepository>()
                 .AddSingleton<IVenueImageProvider, VenueImageProvider>()
@@ -36,7 +41,10 @@ namespace VenueAPI
                 .AddSingleton<ISpaceProvider, SpaceProvider>()
                 .AddSingleton<ISpaceRepository, SpaceRepository>()
                 .AddSingleton<ISpaceImageProvider, SpaceImageProvider>()
-                .AddSingleton<ISpaceImageRepository, SpaceImageRepository>();
+                .AddSingleton<ISpaceImageRepository, SpaceImageRepository>()
+                .AddSingleton<ILocationIqProxy, LocationIqProxy>()
+                .AddSingleton<ILocationIqProvider, LocationIqProvider>()
+                .AddSingleton<ILocationIqRepository, LocationIqRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 

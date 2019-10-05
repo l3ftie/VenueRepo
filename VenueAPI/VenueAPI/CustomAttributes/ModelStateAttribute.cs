@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace VenueAPI.CustomAttributes
         {
             if (!context.ModelState.IsValid)
             {
-                throw new HttpStatusCodeResponseException(HttpStatusCode.BadRequest);
+                throw new HttpStatusCodeResponseException(HttpStatusCode.BadRequest, JsonConvert.SerializeObject(context.ModelState.Keys));
             }
         }
     }

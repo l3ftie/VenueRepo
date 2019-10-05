@@ -7,6 +7,11 @@
   <ItemGroup>
     <PackageReference Include="Dapper.Contrib" Version="2.0.30" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="MongoDB.Bson" Version="2.9.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="APIModels\LocationIq\" />
   </ItemGroup>
 
 </Project>

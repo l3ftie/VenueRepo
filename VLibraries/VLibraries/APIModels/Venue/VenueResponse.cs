@@ -17,5 +17,6 @@ namespace VLibraries.APIModels
         public List<SpaceResponse> Spaces { get; set; }
         public List<VenueImageDto> VenueImages { get; set; }
         public VenueTypeDto VenueType { get; set; }
+        public VenueAddress Address { get; set; }
     }
 }

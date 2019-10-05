@@ -14,6 +14,18 @@ CREATE TABLE [dbo].[Venue](
 	[TestimonialContactOrganisation] [varchar](500) NULL,
 	[TestimonialContactEmail] [varchar](500) NULL,
 	[MUrl] [varchar](250) NOT NULL,
+
+	[Postcode] [varchar](20) NOT NULL,
+	[BuildingNameOrNumber] [varchar](50) NOT NULL,
+	[Road] [varchar](150) NOT NULL,
+	[Town] [varchar](150) NOT NULL,
+	[County] [varchar](150) NOT NULL,
+	[DisplayName] [varchar](500) NOT NULL,
+	[Country] [varchar](150) NOT NULL,
+	[Village] [varchar](150),
+	[Suburb] [varchar](150),
+	[State] [varchar](150) NOT NULL,
+
 	[VenueTypeId] [uniqueidentifier] FOREIGN KEY REFERENCES [VenueType]([VenueTypeId]) NOT NULL );
 
 CREATE TABLE [dbo].[VenueImage](
@@ -28,8 +40,12 @@ CREATE TABLE [dbo].[SpaceType](
 CREATE TABLE [dbo].[Space](
 	[SpaceId] [uniqueidentifier] DEFAULT NEWID() PRIMARY KEY NOT NULL,
 	[VenueId] [uniqueidentifier] FOREIGN KEY REFERENCES Venue([VenueId]) NOT NULL,
-	[MaxCapacity] [int] NOT NULL,
-	[SpaceTypeId] [uniqueidentifier] FOREIGN KEY REFERENCES SpaceType([SpaceTypeId]) NOT NULL );
+	[SpaceTypeId] [uniqueidentifier] FOREIGN KEY REFERENCES SpaceType([SpaceTypeId]) NOT NULL,	
+	[Title] [varchar](150) NOT NULL,
+	[Description] [varchar](500) NOT NULL,
+	[Summary] [varchar](max) NOT NULL,
+	[MUrl] [varchar](250) NOT NULL,
+	[MaxCapacity] [int] NOT NULL );
 	
 CREATE TABLE [dbo].[SpaceImage](
 	[SpaceImageId] [uniqueidentifier] DEFAULT NEWID() PRIMARY KEY NOT NULL,
@@ -53,9 +69,8 @@ from [VenueFinder].[dbo].Venue V
 left outer join [VenueFinder].[dbo].VenueImage VI 
 on VI.VenueId = V.VenueId
 left outer join [VenueFinder].[dbo].VenueType VT 
-on VT.VenueTypeId = V.VenueTypeId 
-WHERE V.VenueId = '60C99C26-315F-491C-9971-3AEB0776A36B';
+on VT.VenueTypeId = V.VenueTypeId ;
 
 
-insert into VenueType (Description) values ('Example description');
+insert into VenueType (Description) values ('Example venue type description');
 insert into SpaceType (Description) values ('Example space type description');

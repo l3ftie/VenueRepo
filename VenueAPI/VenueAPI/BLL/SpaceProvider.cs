@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using VenueAPI.DAL;
 using VenueAPI.Extensions;
+using VenueAPI.Services.LocationIq;
+using VLibraries.APIAbstractions;
 using VLibraries.APIModels;
 
 namespace VenueAPI.BLL
@@ -72,7 +74,7 @@ namespace VenueAPI.BLL
         {
             List<SpaceDto> spaceDtos = await _spaceRepo.GetSpacesAsync(venueIds, requestSpecificallyForSpaces);
 
-            return spaceDtos.MapDtoGroupedByVenueIdToResponses();
+            return spaceDtos.MapDtosToResponses();
         }
     }
 }

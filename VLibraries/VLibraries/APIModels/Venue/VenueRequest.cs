@@ -14,5 +14,7 @@ namespace VLibraries.APIModels
         public string TestimonialContactEmail { get; set; }
         public string MUrl { get; set; }
         public Guid VenueTypeId { get; set; }
+        public string Postcode { get; set; }
+        public string BuildingNameOrNumber { get; set; }
     }
 }

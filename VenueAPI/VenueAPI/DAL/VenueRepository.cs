@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using VenueAPI.Extensions;
 using VLibraries.APIModels;
@@ -17,26 +18,24 @@ namespace VenueAPI.DAL
     public class VenueRepository : IVenueRepository
     {
         private readonly string _connectionString;
-        private readonly IVenueImageRepository _venueImageRepo;
-        private readonly ISpaceRepository _spaceRepo;
 
-        public VenueRepository(IConfiguration config, IVenueImageRepository venueImageRepo, ISpaceRepository spaceRepo)
+        public VenueRepository(IConfiguration config)
         {
             _connectionString = config.GetConnectionString("LocalSqlServer");
-            _venueImageRepo = venueImageRepo;
-            _spaceRepo = spaceRepo;
         }
         
-        public async Task<Guid> AddVenueAsync(VenueRequest venue)
+        public async Task<Guid> AddVenueAsync(VenueDto venue)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 Guid insertedVenueId = await con.QueryFirstOrDefaultAsync<Guid>("DECLARE @TempTable table([VenueId] [uniqueidentifier]); " +
                     "INSERT INTO Venue (Title, Description, Summary, Testimonial, TestimonialContactName, " +
-                    "TestimonialContactOrganisation, TestimonialContactEmail, MUrl, VenueTypeId) " +
+                    "TestimonialContactOrganisation, TestimonialContactEmail, MUrl, VenueTypeId, " +
+                    "Postcode, BuildingNameOrNumber, Road, Town, County, DisplayName, Country, Village, Suburb, State) " +
                     "   OUTPUT INSERTED.[VenueId] INTO @TempTable " +
                     "VALUES (@Title, @Description, @Summary, @Testimonial, @TestimonialContactName, " +
-                    "@TestimonialContactOrganisation, @TestimonialContactEmail, @MUrl, @VenueTypeId);" +
+                    "@TestimonialContactOrganisation, @TestimonialContactEmail, @MUrl, @VenueTypeId," +
+                    "@Postcode, @BuildingNameOrNumber, @Road, @Town, @County, @DisplayName, @Country, @Village, @Suburb, @State);" +
                     "SELECT [VenueId] FROM @TempTable;", venue);
 
                 if (insertedVenueId == Guid.Empty)
@@ -45,12 +44,13 @@ namespace VenueAPI.DAL
                 return insertedVenueId;
             }
         }
-        
+
         public async Task<List<VenueDto>> GetVenueAsync(Guid venueId)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<VenueDto> venueDtos = await con.QueryAsync<VenueDto>("SELECT V.VenueId, V.Title, V.Description, V.MUrl, V.Summary, " +
+                    "V.Postcode, V.BuildingNameOrNumber, V.Road, V.Town, V.County, V.DisplayName, V.Country, V.Village, V.Suburb, V.State, " +
                     "V.Testimonial, V.TestimonialContactEmail, V.TestimonialContactName, V.TestimonialContactOrganisation, " +
                     "VI.VenueImageId, VI.Base64VenueImageString, " +
                     "VT.VenueTypeId, VT.Description as VenueTypeDescription " +
@@ -73,6 +73,7 @@ namespace VenueAPI.DAL
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 IEnumerable<VenueDto> venueDtos = await con.QueryAsync<VenueDto>("SELECT V.VenueId, V.Title, V.Description, V.MUrl, V.Summary, " +
+                    "V.Postcode, V.BuildingNameOrNumber, V.Road, V.Town, V.County, V.DisplayName, V.Country, V.Village, V.Suburb, V.State, " +
                     "V.Testimonial, V.TestimonialContactEmail, V.TestimonialContactName, V.TestimonialContactOrganisation, " +
                     "VI.VenueImageId, VI.Base64VenueImageString, " +
                     "VT.VenueTypeId, VT.Description as VenueTypeDescription " +

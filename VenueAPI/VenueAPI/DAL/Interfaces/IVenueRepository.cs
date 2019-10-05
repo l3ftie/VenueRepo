@@ -9,7 +9,7 @@ namespace VenueAPI.DAL
 
     public interface IVenueRepository
     {
-        Task<Guid> AddVenueAsync(VenueRequest venue);
+        Task<Guid> AddVenueAsync(VenueDto venue);
         Task<List<VenueDto>> GetVenueAsync(Guid id);
         Task<List<VenueDto>> GetVenuesAsync();
         Task<bool> EditVenueAsync(VenueDto venue);

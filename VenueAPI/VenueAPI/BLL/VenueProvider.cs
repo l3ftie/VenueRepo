@@ -1,10 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VenueAPI.DAL;
 using VenueAPI.Extensions;
+using VenueAPI.Services.LocationIq;
 using VLibraries.APIModels;
 
 namespace VenueAPI.BLL
@@ -14,19 +17,35 @@ namespace VenueAPI.BLL
         private readonly IVenueRepository _venueRepo;
         private readonly IVenueImageRepository _venueImageRepo;
         private readonly ISpaceProvider _spaceProvider;
+        private readonly ILocationIqProvider _locationIqProvider;
 
-        public VenueProvider(IVenueRepository venueRepo, IVenueImageRepository venueImageRepo, ISpaceProvider spaceProvider)
+        public VenueProvider(IConfiguration config, IVenueRepository venueRepo, IVenueImageRepository venueImageRepo, ISpaceProvider spaceProvider, ILocationIqProvider locationIqProvider)
         {
             _venueRepo = venueRepo;
             _venueImageRepo = venueImageRepo;
             _spaceProvider = spaceProvider;
+            _locationIqProvider = locationIqProvider;
         }
 
         public async Task<VenueResponse> AddVenueAsync(VenueRequest venue)
         {
-            Guid insertedSpaceId = await _venueRepo.AddVenueAsync(venue);
+            LocationIqReverseResponse locationResponse = await _locationIqProvider.GetLocationDetailsAsync(venue.Postcode);
 
-            return await GetVenueAsync(insertedSpaceId);
+            VenueAddress venueAddress = locationResponse.MapAddressProperties(venue.BuildingNameOrNumber);
+
+            VenueDto venueDto = venue.MapRequestToDto(Guid.Empty, venueAddress);
+
+            Guid insertedVenueId = await _venueRepo.AddVenueAsync(venueDto);
+
+            VenueLocation venueLocation = new VenueLocation
+            {
+                Location = locationResponse.MapToGeoJson(),
+                VenueId = insertedVenueId
+            };
+
+            await _locationIqProvider.AddGeoLocation(venueLocation);
+
+            return await GetVenueAsync(insertedVenueId);
         }
 
         public async Task<VenueResponse> GetVenueAsync(Guid venueId)
@@ -49,7 +68,13 @@ namespace VenueAPI.BLL
 
         public async Task<VenueResponse> EditVenueAsync(VenueRequest venue, Guid venueId)
         {
-            await _venueRepo.EditVenueAsync(venue.MapRequestToDto(venueId));
+            LocationIqReverseResponse locationResponse = await _locationIqProvider.GetLocationDetailsAsync(venue.Postcode);
+
+            VenueAddress venueAddress = locationResponse.MapAddressProperties(venue.BuildingNameOrNumber);
+
+            VenueDto venueDto = venue.MapRequestToDto(Guid.Empty, venueAddress);
+
+            await _venueRepo.EditVenueAsync(venueDto);
 
             return await GetVenueAsync(venueId);
         }

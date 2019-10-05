@@ -1,18 +1,12 @@
-﻿using Dapper.Contrib.Extensions;
-using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace VLibraries.APIModels
 {
-    [Table("Venue")]
-    public class VenueDto : VenueRequest
+    public class VenueAddress
     {
-        [Key]
-        public Guid VenueId { get; set; }
+        public string Postcode { get; set; }
+        public string BuildingNameOrNumber { get; set; }
 
-        public Guid VenueImageId { get; set; }
-        public string VenueTypeDescription { get; set; }
-        public string Base64VenueImageString { get; set; }
         public string Road { get; set; }
         public string Town { get; set; }
         public string County { get; set; }
@@ -21,5 +15,5 @@ namespace VLibraries.APIModels
         public string Village { get; set; }
         public string Suburb { get; set; }
         public string State { get; set; } //England, Scotlad, etc.
-    }
+    }    
 }
