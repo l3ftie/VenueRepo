@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using System.Threading.Tasks;
+using VLibraries.APIModels.GeoJson;
 
 namespace VenueAPI.Services.LocationIq
 {

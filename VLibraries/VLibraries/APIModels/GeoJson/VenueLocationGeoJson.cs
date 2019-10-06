@@ -2,7 +2,7 @@
 
 namespace VLibraries.APIModels
 {
-    public class GeoJson
+    public class VenueLocationGeoJson
     {
         [BsonElement("type")]
         public string Type { get; set; }

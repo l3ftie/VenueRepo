@@ -85,27 +85,22 @@ namespace VenueAPI.Extensions
 
             return model;
         }
-        public static List<VenueResponse> MapSpacesToVenues(this List<VenueDto> venueDtos, List<SpaceResponse> unmappedSpaces)
+
+        public static List<VenueResponse> MapDtosToResponsesAddingSpaces(this List<VenueDto> unmappedVenues, List<SpaceResponse> unmappedSpaces)
         {
             List<VenueResponse> mappedVenues = new List<VenueResponse>();
 
-            List<List<VenueDto>> venueGrouping = venueDtos.GroupVenuesByVenueId();
-
-            List<List<SpaceResponse>> spaceGrouping = unmappedSpaces.GroupSpacesByVenueId();
-
-            foreach (List<VenueDto> groupedVenues in venueGrouping)
+            foreach (List<VenueDto> groupedVenues in unmappedVenues.GroupVenuesByVenueId())
             {
-                List<SpaceResponse> matchingSpaces = groupedVenues.GetMatchingSpaceGroupings(spaceGrouping);
+                List<SpaceResponse> matchingSpaces = groupedVenues.GetSpacesForVenueId(unmappedSpaces.GroupSpacesByVenueId());
 
-                VenueResponse mappedVenue = groupedVenues.MapDtoToResponse(matchingSpaces);
-
-                mappedVenues.Add(mappedVenue);
+                mappedVenues.Add(groupedVenues.MapDtoToResponse(matchingSpaces));
             }
 
             return mappedVenues;
         }
 
-        public static List<SpaceResponse> GetMatchingSpaceGroupings(this List<VenueDto> groupedVenues, List<List<SpaceResponse>> spacesGroupedByVenueId)
+        public static List<SpaceResponse> GetSpacesForVenueId(this List<VenueDto> groupedVenues, List<List<SpaceResponse>> spacesGroupedByVenueId)
         {
             foreach (List<SpaceResponse> spaceGrouping in spacesGroupedByVenueId)
             {

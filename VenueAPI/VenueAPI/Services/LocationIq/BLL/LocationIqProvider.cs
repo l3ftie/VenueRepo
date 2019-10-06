@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VenueAPI.Extensions;
 using VLibraries.APIAbstractions;
 using VLibraries.APIModels;
+using VLibraries.APIModels.GeoJson;
 
 namespace VenueAPI.Services.LocationIq
 {
@@ -33,14 +34,5 @@ namespace VenueAPI.Services.LocationIq
 
             return locationIqResponse;
         }
-    }
-
-    public class VenueLocation
-    {
-        [BsonElement("VenueId")]
-        public Guid VenueId { get; set; }
-
-        [BsonElement("Location")]
-        public GeoJson Location { get; set; }
-    }
+    }   
 }

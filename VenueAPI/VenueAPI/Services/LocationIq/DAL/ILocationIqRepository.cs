@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using VLibraries.APIModels.GeoJson;
 
 namespace VenueAPI.Services.LocationIq
 {

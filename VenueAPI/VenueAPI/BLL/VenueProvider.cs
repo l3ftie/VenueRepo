@@ -9,6 +9,7 @@ using VenueAPI.DAL;
 using VenueAPI.Extensions;
 using VenueAPI.Services.LocationIq;
 using VLibraries.APIModels;
+using VLibraries.APIModels.GeoJson;
 
 namespace VenueAPI.BLL
 {
@@ -63,7 +64,7 @@ namespace VenueAPI.BLL
 
             List<SpaceResponse> spaces = await _spaceProvider.GetSpacesAsync(venueDtos.Select(x => x.VenueId).Distinct().ToList(), false);
 
-            return venueDtos.MapSpacesToVenues(spaces);
+            return venueDtos.MapDtosToResponsesAddingSpaces(spaces);
         }        
 
         public async Task<VenueResponse> EditVenueAsync(VenueRequest venue, Guid venueId)
